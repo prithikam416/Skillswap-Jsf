@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>SkillSwap - Student Dashboard</title>
+    <h:outputStylesheet name="css/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</h:head>
+
+<h:body>
+    <header class="navbar">
+        <a href="dashboard.xhtml" class="brand">🤝 SkillSwap</a>
+        <ul class="nav-links">
+            <li><a href="dashboard.xhtml" class="active">Dashboard</a></li>
+            <li><a href="skills.xhtml">My Skills</a></li>
+            <li><a href="search.xhtml">Search Mentors</a></li>
+            <li><a href="reverse_match.xhtml">Reverse Match</a></li>
+            <li><a href="profile.xhtml">Profile</a></li>
+            <li>
+                <h:form style="display:inline; margin:0;">
+                    <h:commandLink action="#{userBean.logout}" value="Logout"
+                                   style="color:#fca5a5; font-weight:600; text-decoration:none; padding:0.4rem 0.8rem;" />
+                </h:form>
+            </li>
+        </ul>
+    </header>
+
+    <div class="container">
+        <!-- Messages -->
+        <h:messages globalOnly="true" styleClass="ui-messages"
+                    infoClass="ui-messages-info" errorClass="ui-messages-error" />
+
+        <!-- User Greeting Header -->
+        <div class="header-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <span class="badge badge-teach" style="margin-bottom: 0.4rem;">Logged in Student</span>
+                <h1>Welcome, #{userBean.currentUser.name}!</h1>
+                <p>
+                    <strong>USN:</strong> #{userBean.currentUser.usn} • 
+                    <strong>Department:</strong> #{userBean.currentUser.department}
+                </p>
+                <p style="margin-top: 0.3rem; font-style: italic; color: #475569;">
+                    "#{userBean.currentUser.bio}"
+                </p>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Reputation Score</div>
+                <div style="font-size: 2.2rem; font-weight: 800; color: #16a34a;">
+                    ⭐ #{userBean.currentUser.reputationScore} <span style="font-size: 1rem; color: #64748b;">/ 5.0</span>
+                </div>
+                <h:link outcome="profile" value="Edit Profile" styleClass="btn btn-outline btn-sm" style="margin-top: 0.5rem;" />
+            </div>
+        </div>
+
+        <!-- Metric Stat Cards -->
+        <div class="grid-3" style="margin-bottom: 2rem;">
+            <div class="stat-card">
+                <div class="label">Skills I Can Teach (Offered)</div>
+                <div class="value">#{skillBean.getSkillsOffered(userBean.currentUser.id).size()}</div>
+                <p style="font-size: 0.85rem; color: #64748b;">Ready to mentor fellow students</p>
+            </div>
+
+            <div class="stat-card" style="border-left-color: #f59e0b;">
+                <div class="label">Skills I Want to Learn (Wanted)</div>
+                <div class="value" style="color: #d97706;">#{skillBean.getSkillsWanted(userBean.currentUser.id).size()}</div>
+                <p style="font-size: 0.85rem; color: #64748b;">Active learning targets</p>
+            </div>
+
+            <div class="stat-card" style="border-left-color: #10b981;">
+                <div class="label">Reverse Matches Found</div>
+                <div class="value" style="color: #059669;">#{searchBean.fetchReverseMatches(userBean.currentUser.id).size()}</div>
+                <p style="font-size: 0.85rem; color: #64748b;">Peers wanting what you teach</p>
+            </div>
+        </div>
+
+        <!-- Quick Navigation Cards -->
+        <div class="grid-2">
+            <div class="card">
+                <h3>🎯 Skill Management</h3>
+                <p style="color: #64748b; margin-bottom: 1.25rem; font-size: 0.95rem;">
+                    Add and manage skills you can teach to peer students and skills you want to learn from them.
+                </p>
+                <div style="display: flex; gap: 0.75rem;">
+                    <h:link outcome="skills" value="Manage Skills" styleClass="btn btn-primary" />
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🔍 Skill Search &amp; Reverse Match</h3>
+                <p style="color: #64748b; margin-bottom: 1.25rem; font-size: 0.95rem;">
+                    Search for mentors teaching Java or Python, or discover students seeking your skills with instant compatibility %!
+                </p>
+                <div style="display: flex; gap: 0.75rem;">
+                    <h:link outcome="search" value="Search Mentors" styleClass="btn btn-primary" />
+                    <h:link outcome="reverse_match" value="Reverse Match" styleClass="btn btn-success" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Skills Summary Table -->
+        <div class="card">
+            <h3>📋 Your Current Skill Portfolio</h3>
+            <div class="grid-2">
+                <div>
+                    <h4 style="color: #1e40af; margin-bottom: 0.5rem;">Skills You Teach:</h4>
+                    <ui:repeat value="#{skillBean.getSkillsOffered(userBean.currentUser.id)}" var="s">
+                        <span class="badge badge-teach" style="margin: 0.2rem 0.3rem 0.2rem 0;">
+                            #{s.skillName} (#{s.proficiencyLevel})
+                        </span>
+                    </ui:repeat>
+                    <h:panelGroup rendered="#{empty skillBean.getSkillsOffered(userBean.currentUser.id)}">
+                        <p style="color: #94a3b8; font-size: 0.9rem;">No teaching skills listed yet. Click "Manage Skills" to add some!</p>
+                    </h:panelGroup>
+                </div>
+
+                <div>
+                    <h4 style="color: #92400e; margin-bottom: 0.5rem;">Skills You Want to Learn:</h4>
+                    <ui:repeat value="#{skillBean.getSkillsWanted(userBean.currentUser.id)}" var="w">
+                        <span class="badge badge-learn" style="margin: 0.2rem 0.3rem 0.2rem 0;">
+                            #{w.skillName} (#{w.proficiencyLevel})
+                        </span>
+                    </ui:repeat>
+                    <h:panelGroup rendered="#{empty skillBean.getSkillsWanted(userBean.currentUser.id)}">
+                        <p style="color: #94a3b8; font-size: 0.9rem;">No learning targets listed yet.</p>
+                    </h:panelGroup>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        SkillSwap Project • Module 1 &amp; 2 • NNM24CS126 - Prithika
+    </footer>
+</h:body>
+</html>

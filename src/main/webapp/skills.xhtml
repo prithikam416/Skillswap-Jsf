@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>SkillSwap - Manage Skills</title>
+    <h:outputStylesheet name="css/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</h:head>
+
+<h:body>
+    <header class="navbar">
+        <a href="dashboard.xhtml" class="brand">🤝 SkillSwap</a>
+        <ul class="nav-links">
+            <li><a href="dashboard.xhtml">Dashboard</a></li>
+            <li><a href="skills.xhtml" class="active">My Skills</a></li>
+            <li><a href="search.xhtml">Search Mentors</a></li>
+            <li><a href="reverse_match.xhtml">Reverse Match</a></li>
+            <li><a href="profile.xhtml">Profile</a></li>
+            <li>
+                <h:form style="display:inline; margin:0;">
+                    <h:commandLink action="#{userBean.logout}" value="Logout"
+                                   style="color:#fca5a5; font-weight:600; text-decoration:none; padding:0.4rem 0.8rem;" />
+                </h:form>
+            </li>
+        </ul>
+    </header>
+
+    <div class="container">
+        <div class="header-card">
+            <h1>Skill Portfolio Management</h1>
+            <p>Add and manage skills you can teach to peer students and skills you want to learn.</p>
+        </div>
+
+        <!-- Messages -->
+        <h:messages globalOnly="true" styleClass="ui-messages"
+                    infoClass="ui-messages-info" errorClass="ui-messages-error" />
+
+        <!-- Add Skill Form Card -->
+        <div class="card">
+            <h3>➕ Add a New Skill</h3>
+            <h:form id="addSkillForm">
+                <div class="grid-3" style="align-items: flex-end;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="skillName">Skill Name (e.g. Java, Python, SQL)</label>
+                        <h:inputText id="skillName" value="#{skillBean.newSkillName}"
+                                     styleClass="form-control" required="true"
+                                     requiredMessage="Please enter a skill name" />
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="skillType">Category</label>
+                        <h:selectOneMenu id="skillType" value="#{skillBean.newSkillType}" styleClass="form-control">
+                            <f:selectItem itemValue="TEACH" itemLabel="🎓 I can TEACH this (Offered)" />
+                            <f:selectItem itemValue="LEARN" itemLabel="🎯 I want to LEARN this (Wanted)" />
+                        </h:selectOneMenu>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="proficiency">Proficiency</label>
+                        <h:selectOneMenu id="proficiency" value="#{skillBean.newProficiency}" styleClass="form-control">
+                            <f:selectItem itemValue="Beginner" itemLabel="Beginner" />
+                            <f:selectItem itemValue="Intermediate" itemLabel="Intermediate" />
+                            <f:selectItem itemValue="Expert" itemLabel="Expert" />
+                        </h:selectOneMenu>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.25rem;">
+                    <h:commandButton value="Add to Skill Portfolio"
+                                     action="#{skillBean.addSkill(userBean.currentUser.id)}"
+                                     styleClass="btn btn-primary" />
+                </div>
+            </h:form>
+
+            <!-- Quick Add Shortcuts -->
+            <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #f1f5f9;">
+                <span style="font-size: 0.85rem; color: #64748b; font-weight: 600;">⚡ Quick Add Popular Campus Skills:</span>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                    <h:form style="display:inline;">
+                        <h:commandButton value="+ Teach Java" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Java', 'TEACH', 'Expert')}" styleClass="btn btn-outline btn-sm" />
+                    </h:form>
+                    <h:form style="display:inline;">
+                        <h:commandButton value="+ Teach Python" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Python', 'TEACH', 'Expert')}" styleClass="btn btn-outline btn-sm" />
+                    </h:form>
+                    <h:form style="display:inline;">
+                        <h:commandButton value="+ Want Machine Learning" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Machine Learning', 'LEARN', 'Beginner')}" styleClass="btn btn-outline btn-sm" />
+                    </h:form>
+                    <h:form style="display:inline;">
+                        <h:commandButton value="+ Want Figma" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Figma', 'LEARN', 'Beginner')}" styleClass="btn btn-outline btn-sm" />
+                    </h:form>
+                    <h:form style="display:inline;">
+                        <h:commandButton value="+ Teach Web Dev" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Web Development', 'TEACH', 'Expert')}" styleClass="btn btn-outline btn-sm" />
+                    </h:form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tables of Skills -->
+        <div class="grid-2">
+            <!-- Skills Offered (Teach) -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <h3>🎓 Skills I Can Teach (Offered)</h3>
+                    <span class="badge badge-teach">#{skillBean.getSkillsOffered(userBean.currentUser.id).size()} skills</span>
+                </div>
+                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 1rem;">
+                    Peers searching for these skills will find your mentor profile!
+                </p>
+
+                <h:form id="offeredSkillsForm">
+                    <h:dataTable value="#{skillBean.getSkillsOffered(userBean.currentUser.id)}" var="item"
+                                 styleClass="table-custom"
+                                 rendered="#{not empty skillBean.getSkillsOffered(userBean.currentUser.id)}">
+                        <h:column>
+                            <f:facet name="header">Skill Name</f:facet>
+                            <strong>#{item.skillName}</strong>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Proficiency</f:facet>
+                            <span class="badge badge-expert">#{item.proficiencyLevel}</span>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Action</f:facet>
+                            <h:commandButton value="Remove" action="#{skillBean.deleteSkill(item.id)}"
+                                             styleClass="btn btn-danger btn-sm"
+                                             onclick="return confirm('Remove this skill?');" />
+                        </h:column>
+                    </h:dataTable>
+
+                    <h:panelGroup rendered="#{empty skillBean.getSkillsOffered(userBean.currentUser.id)}">
+                        <div style="text-align: center; padding: 2rem; color: #94a3b8;">
+                            No teaching skills added yet. Use the form above to add skills you can mentor!
+                        </div>
+                    </h:panelGroup>
+                </h:form>
+            </div>
+
+            <!-- Skills Wanted (Learn) -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <h3>🎯 Skills I Want to Learn (Wanted)</h3>
+                    <span class="badge badge-learn">#{skillBean.getSkillsWanted(userBean.currentUser.id).size()} targets</span>
+                </div>
+                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 1rem;">
+                    Used by the Reverse Matching Engine to find mutual exchange partners!
+                </p>
+
+                <h:form id="wantedSkillsForm">
+                    <h:dataTable value="#{skillBean.getSkillsWanted(userBean.currentUser.id)}" var="item"
+                                 styleClass="table-custom"
+                                 rendered="#{not empty skillBean.getSkillsWanted(userBean.currentUser.id)}">
+                        <h:column>
+                            <f:facet name="header">Skill Name</f:facet>
+                            <strong>#{item.skillName}</strong>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Proficiency</f:facet>
+                            <span class="badge badge-intermediate">#{item.proficiencyLevel}</span>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Action</f:facet>
+                            <h:commandButton value="Remove" action="#{skillBean.deleteSkill(item.id)}"
+                                             styleClass="btn btn-danger btn-sm"
+                                             onclick="return confirm('Remove this skill?');" />
+                        </h:column>
+                    </h:dataTable>
+
+                    <h:panelGroup rendered="#{empty skillBean.getSkillsWanted(userBean.currentUser.id)}">
+                        <div style="text-align: center; padding: 2rem; color: #94a3b8;">
+                            No learning skills added yet. Add what you want to learn to get matched!
+                        </div>
+                    </h:panelGroup>
+                </h:form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        SkillSwap Project • Module 1: Skill Management • NNM24CS126
+    </footer>
+</h:body>
+</html>

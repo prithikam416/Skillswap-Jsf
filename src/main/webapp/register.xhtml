@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>SkillSwap - Student Registration</title>
+    <h:outputStylesheet name="css/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</h:head>
+
+<h:body>
+    <header class="navbar">
+        <a href="index.xhtml" class="brand">🤝 SkillSwap</a>
+        <ul class="nav-links">
+            <li><a href="index.xhtml">Home</a></li>
+            <li><a href="search.xhtml">Find Mentors</a></li>
+            <li><a href="login.xhtml">Login</a></li>
+            <li><a href="register.xhtml" class="active">Register</a></li>
+        </ul>
+    </header>
+
+    <div class="container" style="max-width: 620px; margin-top: 2rem;">
+        <div class="card" style="padding: 2.25rem;">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <span style="font-size: 2.5rem;">📝</span>
+                <h2 style="margin-top: 0.5rem; color: #1e3a8a;">Student Registration</h2>
+                <p style="color: #64748b; font-size: 0.9rem;">Join the campus skill-learning network (Person 1 Module)</p>
+            </div>
+
+            <!-- Messages -->
+            <h:messages globalOnly="true" styleClass="ui-messages"
+                        infoClass="ui-messages-info" errorClass="ui-messages-error" />
+
+            <h:form id="registerForm">
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="regUsn">Student USN *</label>
+                        <h:inputText id="regUsn" value="#{userBean.regUsn}"
+                                     styleClass="form-control" required="true"
+                                     requiredMessage="USN is required" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regName">Full Name *</label>
+                        <h:inputText id="regName" value="#{userBean.regName}"
+                                     styleClass="form-control" required="true"
+                                     requiredMessage="Full name is required" />
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="regEmail">College Email *</label>
+                        <h:inputText id="regEmail" value="#{userBean.regEmail}"
+                                     styleClass="form-control" required="true"
+                                     requiredMessage="Email is required" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regPass">Password *</label>
+                        <h:inputSecret id="regPass" value="#{userBean.regPassword}"
+                                       styleClass="form-control" required="true"
+                                       requiredMessage="Password is required" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="regDept">Branch / Department</label>
+                    <h:selectOneMenu id="regDept" value="#{userBean.regDepartment}" styleClass="form-control">
+                        <f:selectItem itemValue="Computer Science &amp; Engineering" itemLabel="Computer Science &amp; Engineering" />
+                        <f:selectItem itemValue="Information Science &amp; Engineering" itemLabel="Information Science &amp; Engineering" />
+                        <f:selectItem itemValue="Artificial Intelligence &amp; Data Science" itemLabel="Artificial Intelligence &amp; Data Science" />
+                        <f:selectItem itemValue="Electronics &amp; Communication" itemLabel="Electronics &amp; Communication" />
+                        <f:selectItem itemValue="Mechanical Engineering" itemLabel="Mechanical Engineering" />
+                        <f:selectItem itemValue="Civil Engineering" itemLabel="Civil Engineering" />
+                    </h:selectOneMenu>
+                </div>
+
+                <div class="form-group">
+                    <label for="regBio">About You / Skill Interests</label>
+                    <h:inputTextarea id="regBio" value="#{userBean.regBio}" rows="3"
+                                     styleClass="form-control" />
+                </div>
+
+                <div style="margin-top: 1.5rem;">
+                    <h:commandButton value="Create Student Account" action="#{userBean.register}"
+                                     styleClass="btn btn-primary" style="width: 100%; padding: 0.75rem;" />
+                </div>
+            </h:form>
+
+            <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: #64748b;">
+                Already have an account? 
+                <h:link outcome="login" value="Log in here" style="color: #2563eb; font-weight: 600;" />
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        SkillSwap Project • Module 1: User Management • NNM24CS126
+    </footer>
+</h:body>
+</html>

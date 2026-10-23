@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>SkillSwap - Reverse Skill Matching</title>
+    <h:outputStylesheet name="css/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</h:head>
+
+<h:body>
+    <header class="navbar">
+        <a href="dashboard.xhtml" class="brand">🤝 SkillSwap</a>
+        <ul class="nav-links">
+            <li><a href="dashboard.xhtml">Dashboard</a></li>
+            <li><a href="skills.xhtml">My Skills</a></li>
+            <li><a href="search.xhtml">Search Mentors</a></li>
+            <li><a href="reverse_match.xhtml" class="active">Reverse Match</a></li>
+            <li><a href="profile.xhtml">Profile</a></li>
+            <li>
+                <h:form style="display:inline; margin:0;">
+                    <h:commandLink action="#{userBean.logout}" value="Logout"
+                                   style="color:#fca5a5; font-weight:600; text-decoration:none; padding:0.4rem 0.8rem;" />
+                </h:form>
+            </li>
+        </ul>
+    </header>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header-card">
+            <span class="badge badge-learn" style="margin-bottom: 0.4rem;">Module 2: Reverse Matching Engine</span>
+            <h1>Reverse Skill Match</h1>
+            <p>
+                Instead of searching manually, our Reverse Match Engine automatically finds 
+                students who want to learn what <strong>you teach</strong>!
+            </p>
+        </div>
+
+        <!-- Global Messages -->
+        <h:messages globalOnly="true" styleClass="ui-messages"
+                    infoClass="ui-messages-info" errorClass="ui-messages-error" />
+
+        <!-- Person 3 Integration Confirmation Banner -->
+        <h:panelGroup rendered="#{searchBean.requestSentSuccess}">
+            <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.8rem;">🚀</span>
+                    <div>
+                        <strong style="color: #1e40af; font-size: 1.05rem;">Integration Hand-off to Person 3 Module</strong>
+                        <p style="color: #1e3a8a; font-size: 0.95rem; margin-top: 0.2rem;">
+                            Skill Exchange Request for <strong>'#{searchBean.lastRequestedSkill}'</strong> with student 
+                            <strong>#{searchBean.lastRequestedStudent}</strong> has been created! 
+                            Person 3 will process this request and handle the accept/reject and session workflow.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </h:panelGroup>
+
+        <!-- Current Teaching Skills Banner -->
+        <div class="card" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h3 style="color: #166534; margin-bottom: 0.25rem;">Skills You Currently Offer to Teach:</h3>
+                    <div style="margin-top: 0.4rem;">
+                        <ui:repeat value="#{skillBean.getSkillsOffered(userBean.currentUser.id)}" var="s">
+                            <span class="badge badge-teach" style="margin-right: 0.4rem;">
+                                #{s.skillName} (#{s.proficiencyLevel})
+                            </span>
+                        </ui:repeat>
+                        <h:panelGroup rendered="#{empty skillBean.getSkillsOffered(userBean.currentUser.id)}">
+                            <span style="color: #64748b; font-size: 0.9rem;">You haven't listed any teaching skills yet.</span>
+                        </h:panelGroup>
+                    </div>
+                </div>
+                <div>
+                    <h:link outcome="skills" value="+ Add More Skills to Teach" styleClass="btn btn-outline btn-sm" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Reverse Matches List -->
+        <h3 style="margin: 1.5rem 0 1rem 0;">
+            Students Looking for Your Skills
+            <span style="font-size: 0.95rem; font-weight: normal; color: #64748b;">
+                (Ranked by Mutual Compatibility %)
+            </span>
+        </h3>
+
+        <h:form id="reverseForm">
+            <ui:repeat value="#{searchBean.fetchReverseMatches(userBean.currentUser.id)}" var="match">
+                <div class="match-card">
+                    <!-- Student details -->
+                    <div class="match-info" style="flex: 1;">
+                        <h3>
+                            #{match.student.name}
+                            <span class="badge #{match.matchType eq 'Mutual Skill Swap' ? 'badge-teach' : 'badge-intermediate'}">
+                                #{match.matchType}
+                            </span>
+                            <span style="font-size: 0.9rem; color: #16a34a; font-weight: 600;">
+                                ⭐ #{match.student.reputationScore}
+                            </span>
+                        </h3>
+                        <p>
+                            <strong>USN:</strong> #{match.student.usn} • 
+                            <strong>Department:</strong> #{match.student.department}
+                        </p>
+                        <p style="margin-top: 0.4rem; color: #334155;">
+                            <strong>Wants to Learn from You:</strong> 
+                            <span style="color: #d97706; font-weight: 600;">#{match.matchedSkill}</span>
+                        </p>
+                        <p style="color: #64748b; font-size: 0.85rem;">
+                            <strong>Skills They Can Teach:</strong> #{match.offeredSummary}
+                        </p>
+                        <div style="margin-top: 0.5rem; font-size: 0.85rem; color: #166534; font-weight: 600; background: #ecfdf5; padding: 0.4rem 0.6rem; border-radius: 6px; display: inline-block;">
+                            ✨ #{match.compatibilityReason}
+                        </div>
+                    </div>
+
+                    <!-- Compatibility Box -->
+                    <div class="match-score-box" style="#{match.compatibilityPercentage eq 100 ? 'background: #dcfce7; border-color: #86efac;' : ''}">
+                        <div class="score-number" style="#{match.compatibilityPercentage eq 100 ? 'color: #15803d;' : 'color: #2563eb;'}">
+                            #{match.compatibilityPercentage}%
+                        </div>
+                        <div class="score-label">Compatibility</div>
+                    </div>
+
+                    <!-- Exchange Request Button (Person 3 Integration) -->
+                    <div>
+                        <h:commandButton value="Request Skill Exchange"
+                                         action="#{searchBean.requestSkillExchange(match)}"
+                                         styleClass="btn btn-success"
+                                         style="padding: 0.75rem 1.25rem; white-space: nowrap;" />
+                    </div>
+                </div>
+            </ui:repeat>
+
+            <h:panelGroup rendered="#{empty searchBean.fetchReverseMatches(userBean.currentUser.id)}">
+                <div class="card" style="text-align: center; padding: 3rem; color: #64748b;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🤝</div>
+                    <h3>No reverse matches found yet</h3>
+                    <p style="max-width: 500px; margin: 0 auto 1.5rem auto;">
+                        Make sure you have added skills you can teach in the <strong>My Skills</strong> tab. 
+                        Once you list your skills, students wanting to learn them will appear here automatically!
+                    </p>
+                    <h:link outcome="skills" value="Go to My Skills" styleClass="btn btn-primary" />
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </div>
+
+    <footer>
+        SkillSwap Project • Module 2: Skill Search &amp; Reverse Match • NNM24CS126
+    </footer>
+</h:body>
+</html>

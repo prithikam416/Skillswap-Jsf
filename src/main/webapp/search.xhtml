@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>SkillSwap - Search Mentors</title>
+    <h:outputStylesheet name="css/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</h:head>
+
+<h:body>
+    <header class="navbar">
+        <a href="dashboard.xhtml" class="brand">🤝 SkillSwap</a>
+        <ul class="nav-links">
+            <li><a href="dashboard.xhtml">Dashboard</a></li>
+            <li><a href="skills.xhtml">My Skills</a></li>
+            <li><a href="search.xhtml" class="active">Search Mentors</a></li>
+            <li><a href="reverse_match.xhtml">Reverse Match</a></li>
+            <li><a href="profile.xhtml">Profile</a></li>
+            <li>
+                <h:form style="display:inline; margin:0;">
+                    <h:commandLink action="#{userBean.logout}" value="Logout"
+                                   style="color:#fca5a5; font-weight:600; text-decoration:none; padding:0.4rem 0.8rem;" />
+                </h:form>
+            </li>
+        </ul>
+    </header>
+
+    <div class="container">
+        <div class="header-card">
+            <span class="badge badge-teach" style="margin-bottom: 0.4rem;">Module 2: Skill Search &amp; Compatibility</span>
+            <h1>Find Peer Mentors by Skill</h1>
+            <p>Search for any skill (e.g. Java, Python, Figma) to find students qualified to teach you.</p>
+        </div>
+
+        <!-- Global Messages & Person 3 Integration Status -->
+        <h:messages globalOnly="true" styleClass="ui-messages"
+                    infoClass="ui-messages-info" errorClass="ui-messages-error" />
+
+        <!-- Person 3 Integration Confirmation Banner -->
+        <h:panelGroup rendered="#{searchBean.requestSentSuccess}">
+            <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.8rem;">🚀</span>
+                    <div>
+                        <strong style="color: #1e40af; font-size: 1.05rem;">Integration Hand-off to Person 3 Module</strong>
+                        <p style="color: #1e3a8a; font-size: 0.95rem; margin-top: 0.2rem;">
+                            Skill Exchange Request for <strong>'#{searchBean.lastRequestedSkill}'</strong> with student 
+                            <strong>#{searchBean.lastRequestedStudent}</strong> has been created! 
+                            Person 3 will process this request and handle the accept/reject and session workflow.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </h:panelGroup>
+
+        <!-- Search Input Form -->
+        <div class="card">
+            <h:form id="searchForm">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div style="flex: 1;">
+                        <h:inputText id="searchQuery" value="#{searchBean.searchQuery}"
+                                     styleClass="form-control" style="font-size: 1.05rem; padding: 0.75rem 1rem;" />
+                    </div>
+                    <h:commandButton value="🔍 Search Mentors"
+                                     action="#{searchBean.search(userBean.currentUser.id)}"
+                                     styleClass="btn btn-primary" style="padding: 0.75rem 1.75rem;" />
+                    <h:link outcome="reverse_match" value="🔄 Switch to Reverse Match"
+                            styleClass="btn btn-outline" style="padding: 0.75rem 1rem;" />
+                </div>
+            </h:form>
+
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem; align-items: center;">
+                <span style="font-size: 0.85rem; color: #64748b;">Suggested Searches:</span>
+                <h:form style="display:inline;">
+                    <h:commandLink value="Java" action="#{searchBean.setSearchQuery('Java')}"
+                                   style="font-size: 0.85rem; margin-right: 0.5rem; color: #2563eb;" />
+                    <h:commandLink value="Python" action="#{searchBean.setSearchQuery('Python')}"
+                                   style="font-size: 0.85rem; margin-right: 0.5rem; color: #2563eb;" />
+                    <h:commandLink value="Figma" action="#{searchBean.setSearchQuery('Figma')}"
+                                   style="font-size: 0.85rem; margin-right: 0.5rem; color: #2563eb;" />
+                    <h:commandLink value="Web Development" action="#{searchBean.setSearchQuery('Web Development')}"
+                                   style="font-size: 0.85rem; color: #2563eb;" />
+                </h:form>
+            </div>
+        </div>
+
+        <!-- Search Results Listing -->
+        <h3 style="margin: 1.5rem 0 1rem 0;">
+            Mentor Search Results 
+            <span style="font-size: 0.95rem; font-weight: normal; color: #64748b;">
+                (Ranked by Skill Compatibility &amp; Mentor Reputation)
+            </span>
+        </h3>
+
+        <h:form id="resultsForm">
+            <ui:repeat value="#{searchBean.getSearchResults(userBean.currentUser.id)}" var="result">
+                <div class="match-card">
+                    <!-- Left: Student Info & Match Reason -->
+                    <div class="match-info" style="flex: 1;">
+                        <h3>
+                            #{result.student.name}
+                            <span class="badge badge-expert" style="font-size: 0.75rem;">#{result.student.usn}</span>
+                            <span style="font-size: 0.9rem; color: #16a34a; font-weight: 600;">
+                                ⭐ #{result.student.reputationScore}
+                            </span>
+                        </h3>
+                        <p>
+                            <strong>Department:</strong> #{result.student.department} • 
+                            <strong>Matched Skill:</strong> <span style="color: #1e40af; font-weight: 600;">#{result.matchedSkill}</span>
+                        </p>
+                        <p style="margin-top: 0.4rem; color: #334155;">
+                            <strong>Skills Offered:</strong> #{result.offeredSummary}
+                        </p>
+                        <p style="color: #64748b; font-size: 0.85rem;">
+                            <strong>Wants to Learn:</strong> #{result.wantedSummary}
+                        </p>
+                        <div style="margin-top: 0.5rem; font-size: 0.85rem; color: #0284c7; font-weight: 500;">
+                            💡 #{result.compatibilityReason}
+                        </div>
+                    </div>
+
+                    <!-- Middle: Compatibility Percentage Score -->
+                    <div class="match-score-box">
+                        <div class="score-number">#{result.compatibilityPercentage}%</div>
+                        <div class="score-label">Compatibility</div>
+                    </div>
+
+                    <!-- Right: Person 3 Integration Action Button -->
+                    <div>
+                        <h:commandButton value="Request Skill Exchange"
+                                         action="#{searchBean.requestSkillExchange(result)}"
+                                         styleClass="btn btn-success"
+                                         style="padding: 0.75rem 1.25rem; white-space: nowrap;" />
+                    </div>
+                </div>
+            </ui:repeat>
+
+            <h:panelGroup rendered="#{empty searchBean.getSearchResults(userBean.currentUser.id)}">
+                <div class="card" style="text-align: center; padding: 3rem; color: #64748b;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔍</div>
+                    <h3>No matching mentors found</h3>
+                    <p>Try searching for a different skill, such as "Java", "Python", or "Figma".</p>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </div>
+
+    <footer>
+        SkillSwap Project • Module 2: Skill Search &amp; Reverse Match • NNM24CS126
+    </footer>
+</h:body>
+</html>

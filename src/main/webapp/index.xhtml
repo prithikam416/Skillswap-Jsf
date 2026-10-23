@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>SkillSwap - Peer-to-Peer Learning &amp; Skill Exchange</title>
+    <h:outputStylesheet name="css/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</h:head>
+
+<h:body>
+    <!-- Navbar -->
+    <header class="navbar">
+        <a href="index.xhtml" class="brand">🤝 SkillSwap</a>
+        <ul class="nav-links">
+            <li><a href="index.xhtml" class="active">Home</a></li>
+            <li><a href="search.xhtml">Find Mentors</a></li>
+            <li><a href="login.xhtml">Login</a></li>
+            <li><a href="register.xhtml" class="btn btn-outline" style="color: white; border-color: white;">Register</a></li>
+        </ul>
+    </header>
+
+    <div class="container">
+        <!-- Hero Card -->
+        <div class="header-card" style="text-align: center; padding: 3rem 2rem;">
+            <span class="badge badge-teach" style="margin-bottom: 0.75rem; font-size: 0.85rem;">Person 1 Module: User Management &amp; Skill Matching</span>
+            <h1 style="font-size: 2.3rem; margin: 0.5rem 0 1rem 0;">Learn Together. Teach Each Other.</h1>
+            <p style="font-size: 1.1rem; max-width: 650px; margin: 0 auto 1.75rem auto;">
+                SkillSwap is a campus-exclusive platform where students list the skills they can teach, 
+                discover peers wanting to learn, and trade knowledge directly through smart skill matching!
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <h:link outcome="register" value="Student Registration" styleClass="btn btn-primary" />
+                <h:link outcome="login" value="Student Login" styleClass="btn btn-secondary" />
+                <h:link outcome="search" value="Explore Skills &amp; Mentors" styleClass="btn btn-outline" />
+            </div>
+        </div>
+
+        <!-- Person 1 Responsibilities Grid -->
+        <h2 style="margin-bottom: 1.25rem;">Person 1 Feature Modules</h2>
+        <div class="grid-3">
+            <div class="card">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">👤</div>
+                <h3>1. User Management</h3>
+                <p style="color: #64748b; font-size: 0.95rem;">
+                    Student registration with USN, secure login/logout session handling, and customizable student profile with bio and department.
+                </p>
+                <div style="margin-top: 1rem;">
+                    <h:link outcome="register" value="Register Now →" style="color: #2563eb; font-weight: 600; text-decoration: none;" />
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</div>
+                <h3>2. Skill Management</h3>
+                <p style="color: #64748b; font-size: 0.95rem;">
+                    Manage skills you can teach (Offered) and skills you want to learn (Wanted), along with proficiency levels (Beginner, Intermediate, Expert).
+                </p>
+                <div style="margin-top: 1rem;">
+                    <h:link outcome="skills" value="Manage Skills →" style="color: #2563eb; font-weight: 600; text-decoration: none;" />
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔄</div>
+                <h3>3. Search &amp; Reverse Match</h3>
+                <p style="color: #64748b; font-size: 0.95rem;">
+                    Find mentors teaching Java or Python. Use Reverse Match to find peers wanting what you teach, with automated <strong>Skill Compatibility %</strong> calculation!
+                </p>
+                <div style="margin-top: 1rem;">
+                    <h:link outcome="reverse_match" value="Try Reverse Match →" style="color: #2563eb; font-weight: 600; text-decoration: none;" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Demo Profiles Section -->
+        <div class="card" style="background: #f8fafc; border: 1.5px dashed #cbd5e1;">
+            <h3>🎓 Pre-Configured Demo Accounts for Testing</h3>
+            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1rem;">
+                You can register a new account or log in with one of the pre-seeded student accounts to test search &amp; reverse matching:
+            </p>
+            <div class="grid-3" style="font-size: 0.85rem;">
+                <div style="background: white; padding: 0.8rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <strong>Prithika (Person 1)</strong><br/>
+                    USN: <code>NNM24CS126</code><br/>
+                    Teaches: Java, Web Dev<br/>
+                    Wants: Python, Figma
+                </div>
+                <div style="background: white; padding: 0.8rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <strong>Lassya</strong><br/>
+                    USN: <code>NNM24CS122</code><br/>
+                    Teaches: Python, ML<br/>
+                    Wants: Java, Web Dev
+                </div>
+                <div style="background: white; padding: 0.8rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <strong>Prianka</strong><br/>
+                    USN: <code>NNM24CS125</code><br/>
+                    Teaches: Figma, UI Design<br/>
+                    Wants: Java
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        SkillSwap Project • Developed by Prithika (NNM24CS126) • Powered by JSF &amp; Apache Tomcat
+    </footer>
+</h:body>
+</html>
