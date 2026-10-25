@@ -1,0 +1,218 @@
+/* ------------------------------------------------------------
+   SkillSwapJSF – Global stylesheet (css/style.css)
+   Provides a clean, responsive look for the home page and
+   shared components (navbar, buttons, cards, grid, etc.).
+   ------------------------------------------------------------ */
+
+/* Reset & basic typography */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #1e293b; /* slate‑900 */
+    background-color: #f1f5f9; /* light slate */
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ------------------------------------------------------------
+   Layout helpers
+   ------------------------------------------------------------ */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 0;
+}
+
+/* ------------------------------------------------------------
+   Navbar
+   ------------------------------------------------------------ */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0f172a; /* slate‑900 */
+    padding: 0.75rem 1.5rem;
+    color: #f1f5f9;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar .brand {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: #f1f5f9;
+}
+
+.navbar .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 1.25rem;
+}
+
+.navbar .nav-links li a {
+    color: #cbd5e1; /* slate‑300 */
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.navbar .nav-links li a:hover,
+.navbar .nav-links li a.active {
+    color: #38bdf8; /* sky‑400 */
+}
+
+/* ------------------------------------------------------------
+   Buttons (JSF styleClass mappings)
+   ------------------------------------------------------------ */
+.btn {
+    display: inline-block;
+    padding: 0.55rem 1.2rem;
+    border-radius: 0.4rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: #2563eb; /* blue‑600 */
+    color: #ffffff;
+    border: 1px solid #2563eb;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8; /* blue‑700 */
+}
+
+.btn-secondary {
+    background: #475569; /* slate‑600 */
+    color: #ffffff;
+    border: 1px solid #475569;
+}
+
+.btn-secondary:hover {
+    background: #334155; /* slate‑700 */
+}
+
+.btn-outline {
+    background: transparent;
+    color: #2563eb;
+    border: 1px solid #2563eb;
+}
+
+.btn-outline:hover {
+    background: rgba(37,99,235,0.1);
+}
+
+/* ------------------------------------------------------------
+   Header / Hero Card
+   ------------------------------------------------------------ */
+.header-card {
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    color: #ffffff;
+    border-radius: 0.75rem;
+    padding: 3rem 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.header-card .badge {
+    background: #0f172a;
+    color: #f1f5f9;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+}
+
+/* ------------------------------------------------------------
+   Grid system – three columns on desktop, stacked on mobile
+   ------------------------------------------------------------ */
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0; /* slate‑200 */
+    border-radius: 0.75rem;
+    padding: 1.2rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+}
+
+.card h3 {
+    margin-top: 0.75rem;
+    font-size: 1.2rem;
+    color: #0f172a;
+}
+
+.card p {
+    margin-top: 0.5rem;
+    line-height: 1.4;
+}
+
+/* ------------------------------------------------------------
+   Badge variants (used for module label)
+   ------------------------------------------------------------ */
+.badge-teach {
+    background: #16a34a; /* green‑600 */
+    color: #ffffff;
+}
+
+/* ------------------------------------------------------------
+   Footer
+   ------------------------------------------------------------ */
+footer {
+    margin-top: auto;
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.85rem;
+    color: #64748b; /* slate‑500 */
+    background: #f8fafc; /* light gray */
+}
+
+/* ------------------------------------------------------------
+   Responsive tweaks
+   ------------------------------------------------------------ */
+@media (max-width: 640px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .navbar .nav-links {
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    .header-card {
+        padding: 2rem 1rem;
+    }
+}
+
+/* End of stylesheet */
