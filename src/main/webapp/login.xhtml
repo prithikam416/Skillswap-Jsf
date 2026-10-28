@@ -17,7 +17,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: "class",
             theme: {
                 extend: {
                     colors: {
@@ -42,16 +41,16 @@
     </script>
     <style>
         .field-error-msg {
-            color: #f87171 !important;
-            font-size: 0.8rem !important;
+            color: #ef4444 !important;
+            font-size: 0.82rem !important;
             font-weight: 600 !important;
             display: block !important;
             margin-top: 0.35rem !important;
         }
         .ui-messages-error {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #fca5a5;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
             padding: 0.85rem 1.25rem;
             border-radius: 0.75rem;
             margin-bottom: 1.25rem;
@@ -59,9 +58,9 @@
             list-style: none;
         }
         .ui-messages-info {
-            background: rgba(20, 184, 166, 0.15);
-            border: 1px solid rgba(20, 184, 166, 0.4);
-            color: #2dd4bf;
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            color: #0f766e;
             padding: 0.85rem 1.25rem;
             border-radius: 0.75rem;
             margin-bottom: 1.25rem;
@@ -71,17 +70,17 @@
     </style>
 </h:head>
 
-<h:body class="min-h-screen flex flex-col justify-between bg-[#16324F] font-sans text-white">
+<h:body class="min-h-screen flex flex-col justify-between bg-[#F8FAFC] font-sans text-slate-800">
 
     <!-- Top Navigation Header -->
-    <header class="w-full bg-[#16324F]/95 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+    <header class="w-full bg-[#16324F] text-white border-b border-slate-700/60 sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
             <a href="index.xhtml" class="flex items-center gap-3 no-underline group">
                 <img src="images/logo.png" alt="SkillSwap Campus Exchange" class="h-9 w-auto object-contain transition-transform group-hover:scale-105" />
             </a>
             <div class="flex items-center gap-6 font-semibold text-white text-[15px]">
-                <a class="hover:text-[#14b8a6] transition-colors" href="index.xhtml">Home</a>
-                <a class="hover:text-[#14b8a6] transition-colors" href="search.xhtml">Find Mentors</a>
+                <a class="text-slate-200 hover:text-[#14b8a6] transition-colors" href="index.xhtml">Home</a>
+                <a class="text-slate-200 hover:text-[#14b8a6] transition-colors" href="search.xhtml">Find Mentors</a>
                 <a class="text-[#14b8a6] font-bold" href="login.xhtml">Login</a>
                 <a class="bg-[#14b8a6] text-white font-bold px-5 py-2 rounded-xl hover:bg-white hover:text-[#16324F] transition-all shadow-md shadow-[#14b8a6]/20" href="register.xhtml">Register</a>
             </div>
@@ -89,24 +88,24 @@
     </header>
 
     <!-- Main Login Section -->
-    <main class="flex-1 flex items-center justify-center w-full px-4 py-12 relative overflow-hidden bg-[#16324F]">
+    <main class="flex-1 flex items-center justify-center w-full px-4 py-12 relative overflow-hidden bg-gradient-to-br from-slate-50 via-slate-100 to-teal-50/30">
         <!-- Ambient Glowing Background Elements -->
-        <div class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#14b8a6]/20 blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#14b8a6]/20 blur-3xl pointer-events-none"></div>
-        <div class="absolute top-1/4 right-10 w-64 h-64 rounded-full border-2 border-[#14b8a6]/20 pointer-events-none"></div>
-        <div class="absolute bottom-1/4 left-10 w-48 h-48 rounded-full border-2 border-white/10 pointer-events-none"></div>
+        <div class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-teal-400/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-sky-400/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/4 right-10 w-64 h-64 rounded-full border border-teal-200/50 pointer-events-none"></div>
+        <div class="absolute bottom-1/4 left-10 w-48 h-48 rounded-full border border-slate-200/80 pointer-events-none"></div>
 
-        <!-- Glassmorphism Form Card -->
+        <!-- Clean Light Form Card -->
         <div class="w-full max-w-lg mx-auto my-4 relative z-10">
-            <div class="bg-white/10 backdrop-blur-md border-2 border-white/30 rounded-[32px] p-8 sm:p-11 shadow-2xl flex flex-col items-center">
+            <div class="bg-white border border-slate-200/90 rounded-[32px] p-8 sm:p-11 shadow-xl shadow-slate-200/60 flex flex-col items-center">
                 
                 <!-- Icon Badge -->
-                <div class="w-16 h-16 rounded-2xl bg-[#14b8a6]/20 border border-[#14b8a6] flex items-center justify-center mb-4 text-[#14b8a6]">
+                <div class="w-16 h-16 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center mb-4 text-[#14b8a6]">
                     <span class="material-symbols-outlined text-[32px] text-[#14b8a6]">lock</span>
                 </div>
 
-                <h1 class="text-[28px] sm:text-[32px] font-bold text-white text-center font-display tracking-tight mb-2">Account Sign In</h1>
-                <p class="text-[15px] text-white/80 text-center mb-7">Sign in with your campus credentials to access your peer learning hub</p>
+                <h1 class="text-[28px] sm:text-[32px] font-bold text-slate-900 text-center font-display tracking-tight mb-2">Account Sign In</h1>
+                <p class="text-[15px] text-slate-500 text-center mb-7">Sign in with your campus credentials to access your peer learning hub</p>
 
                 <!-- Global Server Messages -->
                 <div class="w-full">
@@ -115,7 +114,7 @@
                 </div>
 
                 <h:panelGroup rendered="#{param['registered'] eq 'true'}">
-                    <div class="w-full bg-[#14b8a6]/20 border border-[#14b8a6] text-[#2dd4bf] px-4 py-3 rounded-xl mb-5 text-sm font-medium">
+                    <div class="w-full bg-teal-50 border border-teal-300 text-teal-800 px-4 py-3 rounded-xl mb-5 text-sm font-medium">
                         Account created successfully! You can now log in with your credentials.
                     </div>
                 </h:panelGroup>
@@ -125,11 +124,11 @@
                     
                     <!-- Identifier -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[14px] font-bold text-white" for="loginForm:loginId">
+                        <label class="text-[14px] font-bold text-slate-700" for="loginForm:loginId">
                             College USN or Email Address <span class="text-[#ef4444] font-bold">*</span>
                         </label>
                         <h:inputText id="loginId" value="#{userBean.loginIdentifier}"
-                                     class="w-full bg-white/10 border-2 border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/50 text-[15px] focus:outline-none focus:border-[#14b8a6] focus:bg-white/20 transition-all"
+                                     class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 text-[15px] focus:outline-none focus:border-[#14b8a6] focus:bg-white focus:ring-4 focus:ring-teal-500/10 transition-all"
                                      placeholder="e.g. 1MS21CS042 or student@campus.edu" required="true"
                                      requiredMessage="Please enter your USN or College Email." />
                         <h:message for="loginId" styleClass="field-error-msg" />
@@ -137,11 +136,11 @@
 
                     <!-- Password -->
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[14px] font-bold text-white" for="loginForm:loginPass">
+                        <label class="text-[14px] font-bold text-slate-700" for="loginForm:loginPass">
                             Password <span class="text-[#ef4444] font-bold">*</span>
                         </label>
                         <h:inputSecret id="loginPass" value="#{userBean.loginPassword}"
-                                       class="w-full bg-white/10 border-2 border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/50 text-[15px] focus:outline-none focus:border-[#14b8a6] focus:bg-white/20 transition-all"
+                                       class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 text-[15px] focus:outline-none focus:border-[#14b8a6] focus:bg-white focus:ring-4 focus:ring-teal-500/10 transition-all"
                                        placeholder="Enter your account password" required="true"
                                        requiredMessage="Please enter your password." />
                         <h:message for="loginPass" styleClass="field-error-msg" />
@@ -150,12 +149,12 @@
                     <!-- Submit Button -->
                     <div class="pt-3">
                         <h:commandButton value="Sign In to SkillSwap →" action="#{userBean.login}"
-                                         class="w-full bg-[#14b8a6] hover:bg-white hover:text-[#16324F] text-white font-bold text-[16px] py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 border-2 border-[#14b8a6] transition-all shadow-lg cursor-pointer" />
+                                         class="w-full bg-[#14b8a6] hover:bg-[#0d9488] text-white font-bold text-[16px] py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 border-none transition-all shadow-lg shadow-teal-500/25 cursor-pointer" />
                     </div>
 
                     <!-- Register Link -->
                     <div class="text-center pt-2">
-                        <p class="text-[14px] text-white/80">
+                        <p class="text-[14px] text-slate-500">
                             Don't have an account yet? 
                             <a class="font-bold text-[#14b8a6] hover:underline ml-1" href="register.xhtml">Register here</a>
                         </p>
@@ -166,15 +165,15 @@
     </main>
 
     <!-- Footer -->
-    <footer class="w-full bg-[#0f2338] border-t border-white/10 text-white py-5">
+    <footer class="w-full bg-white border-t border-slate-200 text-slate-600 py-5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-[#14b8a6] text-[22px]">handshake</span>
-                <span class="text-[14px] font-bold text-white">SkillSwap Campus Network</span>
-                <span class="text-[#14b8a6]">•</span>
-                <span class="text-[13px] text-white/80">Peer-to-peer campus verification</span>
+                <span class="text-[14px] font-bold text-slate-800">SkillSwap Campus Network</span>
+                <span class="text-slate-300">•</span>
+                <span class="text-[13px] text-slate-500">Peer-to-peer campus verification</span>
             </div>
-            <div class="text-[12px] font-bold text-[#14b8a6] border border-[#14b8a6] px-3 py-1 rounded-lg">ACTIVE NODE: CAMPUS-01</div>
+            <div class="text-[12px] font-bold text-[#0d9488] bg-teal-50 border border-teal-200 px-3 py-1 rounded-lg">ACTIVE NODE: CAMPUS-01</div>
         </div>
     </footer>
 

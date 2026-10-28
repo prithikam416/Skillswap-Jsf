@@ -43,55 +43,55 @@
 
     <!-- Guest View -->
     <h:panelGroup rendered="#{!userBean.loggedIn}">
-        <div class="min-h-screen flex flex-col justify-between bg-[#16324F] font-sans text-white">
+        <div class="min-h-screen flex flex-col justify-between bg-[#F8FAFC] font-sans text-slate-800">
             <!-- Top Navigation Header -->
-            <header class="w-full bg-[#16324F]/95 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+            <header class="w-full bg-[#16324F] text-white border-b border-slate-700/60 sticky top-0 z-50 shadow-sm">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
                     <a href="index.xhtml" class="flex items-center gap-3 no-underline group">
                         <img src="images/logo.png" alt="SkillSwap Campus Exchange" class="h-9 w-auto object-contain transition-transform group-hover:scale-105" />
                     </a>
                     <div class="flex items-center gap-6 font-semibold text-white text-[15px]">
-                        <a class="hover:text-[#14b8a6] transition-colors" href="index.xhtml">Home</a>
+                        <a class="text-slate-200 hover:text-[#14b8a6] transition-colors" href="index.xhtml">Home</a>
                         <a class="text-[#14b8a6] font-bold" href="search.xhtml">Find Mentors</a>
-                        <a class="hover:text-[#14b8a6] transition-colors" href="login.xhtml">Login</a>
+                        <a class="text-slate-200 hover:text-[#14b8a6] transition-colors" href="login.xhtml">Login</a>
                         <a class="bg-[#14b8a6] text-white font-bold px-5 py-2 rounded-xl hover:bg-white hover:text-[#16324F] transition-all shadow-md shadow-[#14b8a6]/20" href="register.xhtml">Register</a>
                     </div>
                 </div>
             </header>
 
             <!-- Main Guest View Section -->
-            <main class="flex-1 flex items-center justify-center w-full px-4 py-12 relative overflow-hidden bg-[#16324F]">
+            <main class="flex-1 flex items-center justify-center w-full px-4 py-12 relative overflow-hidden bg-gradient-to-br from-slate-50 via-slate-100 to-teal-50/30">
                 <!-- Ambient Glowing Background Elements -->
-                <div class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#14b8a6]/20 blur-3xl pointer-events-none"></div>
-                <div class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#14b8a6]/20 blur-3xl pointer-events-none"></div>
+                <div class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-teal-400/10 blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-sky-400/10 blur-3xl pointer-events-none"></div>
 
-                <div class="max-w-lg w-full bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-[32px] p-8 sm:p-12 text-center shadow-2xl relative z-10">
-                    <div class="w-16 h-16 rounded-2xl bg-[#14b8a6]/20 border border-[#14b8a6] text-[#14b8a6] flex items-center justify-center mx-auto text-3xl mb-5">
-                        <span class="material-symbols-outlined text-[34px] text-[#14b8a6]">manage_search</span>
+                <div class="max-w-lg w-full bg-white border border-slate-200/90 rounded-[32px] p-8 sm:p-12 text-center shadow-xl shadow-slate-200/60 relative z-10">
+                    <div class="w-16 h-16 rounded-2xl bg-teal-50 border border-teal-200 text-[#14b8a6] flex items-center justify-center mx-auto text-3xl mb-5">
+                        <span class="material-symbols-outlined text-[34px] text-[#0d9488]">manage_search</span>
                     </div>
-                    <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-white mb-3">Campus Mentor Directory</h2>
-                    <p class="text-sm sm:text-base text-white/80 leading-relaxed mb-8">
+                    <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 mb-3">Campus Mentor Directory</h2>
+                    <p class="text-sm sm:text-base text-slate-600 leading-relaxed mb-8">
                         Sign in with your student credentials to search verified mentors, view peer skill offerings, calculate match compatibility, and send swap requests.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-3.5 justify-center">
                         <h:link outcome="login" value="Sign In to Find Mentors →"
-                                styleClass="bg-[#14b8a6] hover:bg-white hover:text-[#16324F] text-white font-bold text-sm px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-[#14b8a6]/20 flex-1" />
+                                styleClass="bg-[#14b8a6] hover:bg-[#0d9488] text-white font-bold text-sm px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-teal-500/25 flex-1" />
                         <h:link outcome="register" value="Register as Student"
-                                styleClass="bg-white/10 hover:bg-white/20 text-white font-semibold text-sm px-6 py-3.5 rounded-xl border border-white/25 transition-all flex-1" />
+                                styleClass="bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm px-6 py-3.5 rounded-xl border border-slate-300 transition-all flex-1" />
                     </div>
                 </div>
             </main>
 
             <!-- Footer -->
-            <footer class="w-full bg-[#0f2338] border-t border-white/10 text-white py-5">
+            <footer class="w-full bg-white border-t border-slate-200 text-slate-600 py-5">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
                     <div class="flex items-center gap-3">
                         <span class="material-symbols-outlined text-[#14b8a6] text-[22px]">handshake</span>
-                        <span class="text-[14px] font-bold text-white">SkillSwap Campus Network</span>
-                        <span class="text-[#14b8a6]">•</span>
-                        <span class="text-[13px] text-white/80">Peer-to-peer campus verification</span>
+                        <span class="text-[14px] font-bold text-slate-800">SkillSwap Campus Network</span>
+                        <span class="text-slate-300">•</span>
+                        <span class="text-[13px] text-slate-500">Peer-to-peer campus verification</span>
                     </div>
-                    <div class="text-[12px] font-bold text-[#14b8a6] border border-[#14b8a6] px-3 py-1 rounded-lg">ACTIVE NODE: CAMPUS-01</div>
+                    <div class="text-[12px] font-bold text-[#0d9488] bg-teal-50 border border-teal-200 px-3 py-1 rounded-lg">ACTIVE NODE: CAMPUS-01</div>
                 </div>
             </footer>
         </div>

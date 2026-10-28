@@ -42,68 +42,68 @@
     </script>
 </h:head>
 
-<h:body class="min-h-screen flex flex-col justify-between bg-[#16324F] font-sans text-white">
+<h:body class="min-h-screen flex flex-col justify-between bg-[#F8FAFC] font-sans text-slate-800">
 
     <!-- Top Navigation Header -->
-    <header class="w-full bg-[#16324F]/95 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+    <header class="w-full bg-[#16324F] text-white border-b border-slate-700/60 sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
             <a href="index.xhtml" class="flex items-center gap-3 no-underline group">
                 <img src="images/logo.png" alt="SkillSwap Campus Exchange" class="h-9 w-auto object-contain transition-transform group-hover:scale-105" />
             </a>
             <div class="flex items-center gap-6 font-semibold text-white text-[15px]">
                 <a class="text-[#14b8a6] font-bold" href="index.xhtml">Home</a>
-                <a class="hover:text-[#14b8a6] transition-colors" href="search.xhtml">Find Mentors</a>
-                <a class="hover:text-[#14b8a6] transition-colors" href="login.xhtml">Login</a>
+                <a class="text-slate-200 hover:text-[#14b8a6] transition-colors" href="search.xhtml">Find Mentors</a>
+                <a class="text-slate-200 hover:text-[#14b8a6] transition-colors" href="login.xhtml">Login</a>
                 <a class="bg-[#14b8a6] text-white font-bold px-5 py-2 rounded-xl hover:bg-white hover:text-[#16324F] transition-all shadow-md shadow-[#14b8a6]/20" href="register.xhtml">Register</a>
             </div>
         </div>
     </header>
 
     <!-- Hero & Features Content -->
-    <main class="flex-1 w-full relative overflow-hidden bg-[#16324F]">
+    <main class="flex-1 w-full relative overflow-hidden bg-gradient-to-br from-slate-50 via-slate-100 to-teal-50/30">
         <!-- Ambient Glowing Background Elements -->
-        <div class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#14b8a6]/20 blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#14b8a6]/20 blur-3xl pointer-events-none"></div>
-        <div class="absolute top-1/3 right-10 w-80 h-80 rounded-full border border-[#14b8a6]/20 pointer-events-none"></div>
-        <div class="absolute bottom-1/4 left-10 w-64 h-64 rounded-full border border-white/10 pointer-events-none"></div>
+        <div class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-teal-400/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-sky-400/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/3 right-10 w-80 h-80 rounded-full border border-teal-200/50 pointer-events-none"></div>
+        <div class="absolute bottom-1/4 left-10 w-64 h-64 rounded-full border border-slate-200/80 pointer-events-none"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-16 relative z-10">
             
             <!-- Hero Card -->
-            <div class="bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-[32px] p-8 sm:p-14 shadow-2xl text-center max-w-4xl mx-auto mb-16">
-                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#14b8a6]/20 border border-[#14b8a6] text-[#2dd4bf] text-xs font-bold uppercase tracking-wider mb-5">
-                    <span class="w-2 h-2 rounded-full bg-[#2dd4bf] animate-pulse"></span>
+            <div class="bg-white border border-slate-200/90 rounded-[32px] p-8 sm:p-14 shadow-xl shadow-slate-200/60 text-center max-w-4xl mx-auto mb-16">
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-[#0d9488] text-xs font-bold uppercase tracking-wider mb-5">
+                    <span class="w-2 h-2 rounded-full bg-[#14b8a6] animate-pulse"></span>
                     Campus Peer Mentoring &amp; Knowledge Exchange
                 </span>
-                <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-display mb-5 leading-tight">
+                <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight font-display mb-5 leading-tight">
                     Learn Together.<br class="hidden sm:inline" /> <span class="text-[#14b8a6]">Teach Each Other.</span>
                 </h1>
-                <p class="text-base sm:text-lg text-white/80 max-w-2xl mx-auto mb-8 font-light leading-relaxed">
+                <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto mb-8 font-normal leading-relaxed">
                     SkillSwap is a campus-exclusive platform where students list the skills they can teach, 
                     discover peers wanting to learn, and trade knowledge directly through smart two-way skill matching!
                 </p>
                 <div class="flex flex-wrap items-center justify-center gap-4">
                     <h:link outcome="register" value="Student Registration →"
-                            styleClass="bg-[#14b8a6] hover:bg-white hover:text-[#16324F] text-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-[#14b8a6]/25" />
+                            styleClass="bg-[#14b8a6] hover:bg-[#0d9488] text-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-teal-500/25" />
                     <h:link outcome="login" value="Student Login"
-                            styleClass="bg-white/15 hover:bg-white/25 text-white font-semibold text-sm sm:text-base px-6 py-3.5 rounded-xl border border-white/30 transition-all backdrop-blur-sm" />
+                            styleClass="bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm sm:text-base px-6 py-3.5 rounded-xl border border-slate-300 transition-all" />
                     <h:link outcome="search" value="Explore Mentors"
-                            styleClass="bg-transparent hover:bg-white/10 text-[#2dd4bf] font-semibold text-sm sm:text-base px-6 py-3.5 rounded-xl border border-[#14b8a6]/60 transition-all" />
+                            styleClass="bg-white hover:bg-teal-50 text-[#0d9488] font-semibold text-sm sm:text-base px-6 py-3.5 rounded-xl border border-teal-300 transition-all shadow-sm" />
                 </div>
 
                 <!-- Stats Highlights -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-10 mt-10 border-t border-white/15 text-center">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-10 mt-10 border-t border-slate-200 text-center">
                     <div>
-                        <div class="text-2xl sm:text-3xl font-extrabold text-[#2dd4bf] font-display">100%</div>
-                        <div class="text-xs uppercase tracking-wider text-white/70 mt-1 font-semibold">Campus Verified Peers</div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-[#0d9488] font-display">100%</div>
+                        <div class="text-xs uppercase tracking-wider text-slate-500 mt-1 font-semibold">Campus Verified Peers</div>
                     </div>
                     <div>
-                        <div class="text-2xl sm:text-3xl font-extrabold text-[#2dd4bf] font-display">Mutual</div>
-                        <div class="text-xs uppercase tracking-wider text-white/70 mt-1 font-semibold">Reverse Skill Matching</div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-[#0d9488] font-display">Mutual</div>
+                        <div class="text-xs uppercase tracking-wider text-slate-500 mt-1 font-semibold">Reverse Skill Matching</div>
                     </div>
                     <div>
-                        <div class="text-2xl sm:text-3xl font-extrabold text-[#2dd4bf] font-display">0 Cost</div>
-                        <div class="text-xs uppercase tracking-wider text-white/70 mt-1 font-semibold">Peer-to-Peer Learning</div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-[#0d9488] font-display">0 Cost</div>
+                        <div class="text-xs uppercase tracking-wider text-slate-500 mt-1 font-semibold">Peer-to-Peer Learning</div>
                     </div>
                 </div>
             </div>
@@ -111,79 +111,79 @@
             <!-- Platform Features Grid -->
             <div class="mb-16">
                 <div class="text-center mb-10">
-                    <h2 class="text-2xl sm:text-3xl font-bold font-display text-white mb-2">Core Platform Modules</h2>
-                    <p class="text-white/70 text-sm max-w-lg mx-auto">Everything you need to trade skills and elevate your campus academic experience</p>
+                    <h2 class="text-2xl sm:text-3xl font-bold font-display text-slate-900 mb-2">Core Platform Modules</h2>
+                    <p class="text-slate-500 text-sm max-w-lg mx-auto">Everything you need to trade skills and elevate your campus academic experience</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Feature 1 -->
-                    <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-7 hover:border-[#14b8a6] transition-all group flex flex-col justify-between">
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-7 hover:border-[#14b8a6] hover:shadow-lg transition-all group flex flex-col justify-between shadow-sm">
                         <div>
-                            <div class="w-12 h-12 rounded-xl bg-[#14b8a6]/20 text-[#14b8a6] flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            <div class="w-12 h-12 rounded-xl bg-teal-50 text-[#14b8a6] border border-teal-100 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
                                 👤
                             </div>
-                            <h3 class="text-lg font-bold text-white mb-2">Student Verification</h3>
-                            <p class="text-white/70 text-sm leading-relaxed mb-4">
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Student Verification</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-4">
                                 Secure student registration with USN, campus email verification, and customizable profile portfolios with bios and academic departments.
                             </p>
                         </div>
-                        <h:link outcome="register" value="Register Now →" styleClass="text-[#2dd4bf] text-sm font-bold hover:underline inline-flex items-center gap-1" />
+                        <h:link outcome="register" value="Register Now →" styleClass="text-[#0d9488] text-sm font-bold hover:underline inline-flex items-center gap-1" />
                     </div>
 
                     <!-- Feature 2 -->
-                    <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-7 hover:border-[#14b8a6] transition-all group flex flex-col justify-between">
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-7 hover:border-[#14b8a6] hover:shadow-lg transition-all group flex flex-col justify-between shadow-sm">
                         <div>
-                            <div class="w-12 h-12 rounded-xl bg-[#14b8a6]/20 text-[#14b8a6] flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            <div class="w-12 h-12 rounded-xl bg-teal-50 text-[#14b8a6] border border-teal-100 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
                                 🎯
                             </div>
-                            <h3 class="text-lg font-bold text-white mb-2">Skill Portfolio</h3>
-                            <p class="text-white/70 text-sm leading-relaxed mb-4">
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Skill Portfolio</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-4">
                                 Showcase skills you teach and mark skills you want to learn with proficiency tags from Beginner to Expert.
                             </p>
                         </div>
-                        <h:link outcome="login" value="Manage Skills →" styleClass="text-[#2dd4bf] text-sm font-bold hover:underline inline-flex items-center gap-1" />
+                        <h:link outcome="login" value="Manage Skills →" styleClass="text-[#0d9488] text-sm font-bold hover:underline inline-flex items-center gap-1" />
                     </div>
 
                     <!-- Feature 3 -->
-                    <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-7 hover:border-[#14b8a6] transition-all group flex flex-col justify-between">
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-7 hover:border-[#14b8a6] hover:shadow-lg transition-all group flex flex-col justify-between shadow-sm">
                         <div>
-                            <div class="w-12 h-12 rounded-xl bg-[#14b8a6]/20 text-[#14b8a6] flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            <div class="w-12 h-12 rounded-xl bg-teal-50 text-[#14b8a6] border border-teal-100 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
                                 🔄
                             </div>
-                            <h3 class="text-lg font-bold text-white mb-2">Reverse Match</h3>
-                            <p class="text-white/70 text-sm leading-relaxed mb-4">
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Reverse Match</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-4">
                                 Real-time compatibility calculation matching your learning goals directly with students who teach them and want what you offer.
                             </p>
                         </div>
-                        <h:link outcome="search" value="Explore Mentors →" styleClass="text-[#2dd4bf] text-sm font-bold hover:underline inline-flex items-center gap-1" />
+                        <h:link outcome="search" value="Explore Mentors →" styleClass="text-[#0d9488] text-sm font-bold hover:underline inline-flex items-center gap-1" />
                     </div>
                 </div>
             </div>
 
             <!-- How It Works Section -->
-            <div class="bg-white/5 backdrop-blur-sm border border-white/15 rounded-3xl p-8 sm:p-12">
-                <h2 class="text-2xl sm:text-3xl font-bold font-display text-white text-center mb-10">How SkillSwap Works</h2>
+            <div class="bg-white border border-slate-200/90 rounded-3xl p-8 sm:p-12 shadow-sm">
+                <h2 class="text-2xl sm:text-3xl font-bold font-display text-slate-900 text-center mb-10">How SkillSwap Works</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                     <div class="flex flex-col items-center">
-                        <div class="w-14 h-14 rounded-2xl bg-[#14b8a6]/20 border border-[#14b8a6] flex items-center justify-center text-2xl mb-4 text-[#2dd4bf]">
+                        <div class="w-14 h-14 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-2xl mb-4 text-[#0d9488]">
                             📝
                         </div>
-                        <h4 class="text-base font-bold text-white mb-1">1. Create Profile</h4>
-                        <p class="text-white/70 text-sm max-w-xs">Register with your campus USN and email to join your local peer learning hub.</p>
+                        <h4 class="text-base font-bold text-slate-900 mb-1">1. Create Profile</h4>
+                        <p class="text-slate-600 text-sm max-w-xs">Register with your campus USN and email to join your local peer learning hub.</p>
                     </div>
                     <div class="flex flex-col items-center">
-                        <div class="w-14 h-14 rounded-2xl bg-[#14b8a6]/20 border border-[#14b8a6] flex items-center justify-center text-2xl mb-4 text-[#2dd4bf]">
+                        <div class="w-14 h-14 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-2xl mb-4 text-[#0d9488]">
                             💡
                         </div>
-                        <h4 class="text-base font-bold text-white mb-1">2. List Your Skills</h4>
-                        <p class="text-white/70 text-sm max-w-xs">Add the topics you can teach and what you want to learn to your portfolio.</p>
+                        <h4 class="text-base font-bold text-slate-900 mb-1">2. List Your Skills</h4>
+                        <p class="text-slate-600 text-sm max-w-xs">Add the topics you can teach and what you want to learn to your portfolio.</p>
                     </div>
                     <div class="flex flex-col items-center">
-                        <div class="w-14 h-14 rounded-2xl bg-[#14b8a6]/20 border border-[#14b8a6] flex items-center justify-center text-2xl mb-4 text-[#2dd4bf]">
+                        <div class="w-14 h-14 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-2xl mb-4 text-[#0d9488]">
                             🤝
                         </div>
-                        <h4 class="text-base font-bold text-white mb-1">3. Connect &amp; Swap</h4>
-                        <p class="text-white/70 text-sm max-w-xs">Connect for peer-to-peer exchange sessions, earn reputation stars, and rank on the leaderboard.</p>
+                        <h4 class="text-base font-bold text-slate-900 mb-1">3. Connect &amp; Swap</h4>
+                        <p class="text-slate-600 text-sm max-w-xs">Connect for peer-to-peer exchange sessions, earn reputation stars, and rank on the leaderboard.</p>
                     </div>
                 </div>
             </div>
@@ -192,15 +192,15 @@
     </main>
 
     <!-- Footer -->
-    <footer class="w-full bg-[#0f2338] border-t border-white/10 text-white py-5">
+    <footer class="w-full bg-white border-t border-slate-200 text-slate-600 py-5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-[#14b8a6] text-[22px]">handshake</span>
-                <span class="text-[14px] font-bold text-white">SkillSwap Campus Network</span>
-                <span class="text-[#14b8a6]">•</span>
-                <span class="text-[13px] text-white/80">Peer-to-peer campus verification</span>
+                <span class="text-[14px] font-bold text-slate-800">SkillSwap Campus Network</span>
+                <span class="text-slate-300">•</span>
+                <span class="text-[13px] text-slate-500">Peer-to-peer campus verification</span>
             </div>
-            <div class="text-[12px] font-bold text-[#14b8a6] border border-[#14b8a6] px-3 py-1 rounded-lg">ACTIVE NODE: CAMPUS-01</div>
+            <div class="text-[12px] font-bold text-[#0d9488] bg-teal-50 border border-teal-200 px-3 py-1 rounded-lg">ACTIVE NODE: CAMPUS-01</div>
         </div>
     </footer>
 
