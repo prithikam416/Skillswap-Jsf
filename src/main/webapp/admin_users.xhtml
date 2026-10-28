@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>SkillSwap - User Management</title>
+    <h:outputStylesheet library="css" name="style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</h:head>
+
+<h:body>
+    <!-- Admin Access Check -->
+    <h:panelGroup rendered="#{!userBean.admin}">
+        <div class="container" style="max-width: 500px; margin-top: 4rem; text-align: center;">
+            <div class="card" style="padding: 3rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔒</div>
+                <h2 style="color: var(--danger); margin-bottom: 0.75rem;">Access Denied</h2>
+                <a href="login.xhtml?logout=true" class="btn btn-primary">Sign in with Admin Account</a>
+            </div>
+        </div>
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{userBean.admin}">
+        <!-- Admin Navbar -->
+        <header class="navbar">
+            <a href="admin_dashboard.xhtml" class="brand" style="display: flex; align-items: center; gap: 0.5rem;">
+                <img src="images/logo.png" alt="SkillSwap Admin" style="height: 28px; width: auto;" />
+                <span style="font-size: 0.85rem; background: rgba(20, 184, 166, 0.2); color: #2dd4bf; padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 700; border: 1px solid rgba(20, 184, 166, 0.4);">ADMIN</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="admin_dashboard.xhtml">Dashboard</a></li>
+                <li><a href="admin_users.xhtml" class="active">Users</a></li>
+                <li><a href="admin_reports.xhtml">Reports</a></li>
+                <li><a href="leaderboard.xhtml">Leaderboard</a></li>
+                <li>
+                    <h:form style="display:inline; margin:0;">
+                        <h:commandLink action="#{userBean.logout}" value="Logout"
+                                       style="color:#fca5a5; font-weight:600; text-decoration:none; padding:0.4rem 0.8rem;" />
+                    </h:form>
+                </li>
+            </ul>
+        </header>
+
+        <div class="admin-layout">
+            <!-- Sidebar -->
+            <aside class="admin-sidebar">
+                <div class="sidebar-header">
+                    <h3>📊 Admin Panel</h3>
+                    <p>Welcome, #{userBean.currentUser.name}</p>
+                </div>
+                <ul class="sidebar-nav">
+                    <li><a href="admin_dashboard.xhtml"><span class="nav-icon">📊</span> Dashboard</a></li>
+                    <li><a href="admin_users.xhtml" class="active"><span class="nav-icon">👥</span> User Management</a></li>
+                    <li><a href="admin_reports.xhtml"><span class="nav-icon">📋</span> Reports</a></li>
+                    <li><a href="leaderboard.xhtml"><span class="nav-icon">🏆</span> Leaderboard</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="admin-content">
+                <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">User Management</h1>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">View, search, and manage student accounts</p>
+
+                <h:messages globalOnly="true" styleClass="ui-messages"
+                            infoClass="ui-messages-info" errorClass="ui-messages-error" />
+
+                <!-- Search and Filter Bar -->
+                <h:form id="userMgmtForm">
+                    <div class="search-bar">
+                        <h:inputText value="#{adminBean.userSearchQuery}" styleClass="form-control"
+                                     style="flex: 1; max-width: 400px;"
+                                     id="searchInput" />
+                        <h:selectOneMenu value="#{adminBean.userStatusFilter}" styleClass="form-control"
+                                         style="max-width: 160px;">
+                            <f:selectItem itemValue="ALL" itemLabel="All Status" />
+                            <f:selectItem itemValue="ACTIVE" itemLabel="Active Only" />
+                            <f:selectItem itemValue="INACTIVE" itemLabel="Inactive Only" />
+                        </h:selectOneMenu>
+                        <h:commandButton value="🔍 Search" styleClass="btn btn-primary" />
+                    </div>
+
+                    <!-- Students Table -->
+                    <div class="card" style="padding: 0; overflow: hidden;">
+                        <h:dataTable value="#{adminBean.filteredStudents}" var="student" styleClass="table-custom"
+                                     rendered="#{not empty adminBean.filteredStudents}">
+                            <h:column>
+                                <f:facet name="header">Student</f:facet>
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div class="profile-avatar" style="width: 36px; height: 36px; font-size: 0.85rem;">
+                                        #{student.initials}
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600;">#{student.name}</div>
+                                        <div style="font-size: 0.78rem; color: var(--text-muted);">#{student.email}</div>
+                                    </div>
+                                </div>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">USN</f:facet>
+                                <code style="font-size: 0.85rem;">#{student.usn}</code>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Department</f:facet>
+                                #{student.department}
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Reputation</f:facet>
+                                <span class="stars">⭐</span>
+                                <span style="font-weight: 600;">#{student.reputationScore}</span>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Status</f:facet>
+                                <span class="badge #{student.active ? 'badge-active' : 'badge-inactive'}">
+                                    #{student.active ? 'Active' : 'Inactive'}
+                                </span>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Actions</f:facet>
+                                <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                                    <h:commandButton value="👁 View" action="#{adminBean.viewUserProfile(student.id)}"
+                                                     styleClass="btn btn-outline btn-sm" />
+                                    <h:commandButton value="Deactivate" rendered="#{student.active}"
+                                                     action="#{adminBean.deactivateUser(student.id)}"
+                                                     styleClass="btn btn-warning btn-sm" />
+                                    <h:commandButton value="Activate" rendered="#{!student.active}"
+                                                     action="#{adminBean.activateUser(student.id)}"
+                                                     styleClass="btn btn-success btn-sm" />
+                                    <h:commandButton value="🗑 Delete" action="#{adminBean.deleteUser(student.id)}"
+                                                     styleClass="btn btn-danger btn-sm"
+                                                     onclick="return confirm('Are you sure you want to permanently delete this student account? This action cannot be undone.');" />
+                                </div>
+                            </h:column>
+                        </h:dataTable>
+
+                        <h:panelGroup rendered="#{empty adminBean.filteredStudents}">
+                            <div class="empty-state">
+                                <div class="empty-icon">👥</div>
+                                <h3>No students found</h3>
+                                <p>Try adjusting your search or filter criteria.</p>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+
+                    <!-- User Profile Detail Panel -->
+                    <h:panelGroup rendered="#{adminBean.viewUser != null}">
+                        <div class="profile-modal" style="margin-top: 1.5rem;">
+                            <div class="profile-header">
+                                <div class="profile-avatar">#{adminBean.viewUser.initials}</div>
+                                <div>
+                                    <h2 style="font-size: 1.25rem; margin-bottom: 0.15rem;">#{adminBean.viewUser.name}</h2>
+                                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                                        #{adminBean.viewUser.usn} · #{adminBean.viewUser.email}
+                                    </p>
+                                    <span class="badge #{adminBean.viewUser.active ? 'badge-active' : 'badge-inactive'}" style="margin-top: 0.25rem;">
+                                        #{adminBean.viewUser.active ? 'Active' : 'Inactive'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="grid-2" style="margin-top: 0;">
+                                <div>
+                                    <p style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Department</p>
+                                    <p style="font-weight: 500;">#{adminBean.viewUser.department}</p>
+                                </div>
+                                <div>
+                                    <p style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Reputation</p>
+                                    <p><span class="stars">⭐</span> <strong>#{adminBean.viewUser.reputationScore}</strong> / 5.0
+                                        (#{ratingBean.getUserRatingCount(adminBean.viewUserId)} ratings)</p>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 1rem;">
+                                <p style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Bio</p>
+                                <p style="color: var(--text-secondary); font-style: italic;">#{adminBean.viewUser.bio}</p>
+                            </div>
+
+                            <div class="grid-2" style="margin-top: 1rem;">
+                                <div>
+                                    <p style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 0.35rem;">Skills They Teach</p>
+                                    <ui:repeat value="#{adminBean.viewUserTeachSkills}" var="s">
+                                        <span class="badge badge-teach" style="margin: 0.15rem 0.2rem;">#{s.skillName} (#{s.proficiencyLevel})</span>
+                                    </ui:repeat>
+                                    <h:panelGroup rendered="#{empty adminBean.viewUserTeachSkills}">
+                                        <span style="color: var(--text-muted); font-size: 0.88rem;">None listed</span>
+                                    </h:panelGroup>
+                                </div>
+                                <div>
+                                    <p style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 0.35rem;">Skills They Want to Learn</p>
+                                    <ui:repeat value="#{adminBean.viewUserLearnSkills}" var="s">
+                                        <span class="badge badge-learn" style="margin: 0.15rem 0.2rem;">#{s.skillName} (#{s.proficiencyLevel})</span>
+                                    </ui:repeat>
+                                    <h:panelGroup rendered="#{empty adminBean.viewUserLearnSkills}">
+                                        <span style="color: var(--text-muted); font-size: 0.88rem;">None listed</span>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+
+                            <!-- Ratings received -->
+                            <h:panelGroup rendered="#{not empty adminBean.viewUserRatings}">
+                                <p style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin: 1rem 0 0.35rem;">Ratings Received</p>
+                                <ui:repeat value="#{adminBean.viewUserRatings}" var="rating">
+                                    <div class="activity-item">
+                                        <div class="activity-icon icon-amber">⭐</div>
+                                        <div class="activity-info">
+                                            <div class="activity-title">
+                                                <span class="stars">#{rating.starsDisplay}</span> by #{rating.raterName}
+                                            </div>
+                                            <div class="activity-meta">#{rating.feedback}</div>
+                                        </div>
+                                    </div>
+                                </ui:repeat>
+                            </h:panelGroup>
+
+                            <div style="margin-top: 1.25rem;">
+                                <h:commandButton value="Close Profile" action="#{adminBean.viewUserProfile(0)}"
+                                                 styleClass="btn btn-secondary btn-sm" />
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                </h:form>
+            </main>
+        </div>
+    </h:panelGroup>
+
+    <footer>
+        SkillSwap • Campus Peer-to-Peer Skill Learning &amp; Exchange Platform
+    </footer>
+</h:body>
+</html>

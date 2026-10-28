@@ -22,6 +22,17 @@
         <param-value>.xhtml</param-value>
     </context-param>
 
+    <!-- Authentication & Access Control Filter -->
+    <filter>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>com.skillswap.filter.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>*.xhtml</url-pattern>
+        <url-pattern>/faces/*</url-pattern>
+    </filter-mapping>
+
     <listener>
         <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
     </listener>
@@ -44,5 +55,9 @@
 
     <session-config>
         <session-timeout>30</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+        </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
     </session-config>
 </web-app>

@@ -13,89 +13,81 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SkillDAO {
 
     private static final List<UserSkill> memorySkills = new CopyOnWriteArrayList<>();
-    private static final AtomicInteger skillIdCounter = new AtomicInteger(50);
+    private static final AtomicInteger skillIdCounter = new AtomicInteger(1);
     private final UserDAO userDAO = new UserDAO();
 
-    static {
-        // Pre-seed skills
-        // User 1 (Prithika): Teaches Java (Expert), Web Development (Expert); Wants Python, Figma
-        memorySkills.add(new UserSkill(1, 1, "Java", "TEACH", "Expert"));
-        memorySkills.add(new UserSkill(2, 1, "Web Development", "TEACH", "Expert"));
-        memorySkills.add(new UserSkill(3, 1, "Python", "LEARN", "Beginner"));
-        memorySkills.add(new UserSkill(4, 1, "Figma", "LEARN", "Beginner"));
-
-        // User 2 (Lassya): Teaches Python (Expert), Machine Learning (Intermediate); Wants Java, Web Development
-        memorySkills.add(new UserSkill(5, 2, "Python", "TEACH", "Expert"));
-        memorySkills.add(new UserSkill(6, 2, "Machine Learning", "TEACH", "Intermediate"));
-        memorySkills.add(new UserSkill(7, 2, "Java", "LEARN", "Intermediate"));
-        memorySkills.add(new UserSkill(8, 2, "Web Development", "LEARN", "Beginner"));
-
-        // User 3 (Prianka): Teaches Figma (Expert), UI Design (Expert); Wants Java
-        memorySkills.add(new UserSkill(9, 3, "Figma", "TEACH", "Expert"));
-        memorySkills.add(new UserSkill(10, 3, "UI Design", "TEACH", "Expert"));
-        memorySkills.add(new UserSkill(11, 3, "Java", "LEARN", "Beginner"));
-
-        // User 4 (Rahul): Teaches Java (Expert); Wants Python
-        memorySkills.add(new UserSkill(12, 4, "Java", "TEACH", "Expert"));
-        memorySkills.add(new UserSkill(13, 4, "Python", "LEARN", "Beginner"));
-
-        // User 5 (Ananya): Teaches C++ (Intermediate); Wants Java
-        memorySkills.add(new UserSkill(14, 5, "C++", "TEACH", "Intermediate"));
-        memorySkills.add(new UserSkill(15, 5, "Java", "LEARN", "Beginner"));
-    }
-
     public boolean addSkill(int userId, String skillName, String skillType, String proficiencyLevel) {
-        if (skillName == null || skillName.trim().isEmpty()) return false;
+        if (userId <= 0 || skillName == null || skillName.trim().isEmpty()) return false;
         String cleanSkill = skillName.trim();
         String cleanType = (skillType != null && skillType.equalsIgnoreCase("LEARN")) ? "LEARN" : "TEACH";
         String cleanProf = (proficiencyLevel != null && !proficiencyLevel.isEmpty()) ? proficiencyLevel : "Intermediate";
 
         if (DBUtil.isDatabaseAvailable()) {
-            String sql = "INSERT INTO user_skills (user_id, skill_name, skill_type, proficiency_level) VALUES (?, ?, ?, ?)";
+            // Check for existing duplicate skill
+            String checkSql = "SELECT id FROM user_skills WHERE user_id = ? AND LOWER(skill_name) = LOWER(?) AND skill_type = ?";
             try (Connection conn = DBUtil.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                ps.setInt(1, userId);
-                ps.setString(2, cleanSkill);
-                ps.setString(3, cleanType);
-                ps.setString(4, cleanProf);
-                int rows = ps.executeUpdate();
-                return rows > 0;
+                 PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
+                checkPs.setInt(1, userId);
+                checkPs.setString(2, cleanSkill);
+                checkPs.setString(3, cleanType);
+                try (ResultSet rs = checkPs.executeQuery()) {
+                    if (rs.next()) {
+                        return false; // Already in user portfolio
+                    }
+                }
+
+                String sql = "INSERT INTO user_skills (user_id, skill_name, skill_type, proficiency_level) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                    ps.setInt(1, userId);
+                    ps.setString(2, cleanSkill);
+                    ps.setString(3, cleanType);
+                    ps.setString(4, cleanProf);
+                    return ps.executeUpdate() > 0;
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
+                return false;
             }
         }
 
         // Memory fallback
         for (UserSkill us : memorySkills) {
             if (us.getUserId() == userId && us.getSkillName().equalsIgnoreCase(cleanSkill) && us.getSkillType().equalsIgnoreCase(cleanType)) {
-                return false; // already added
+                return false;
             }
         }
         memorySkills.add(new UserSkill(skillIdCounter.incrementAndGet(), userId, cleanSkill, cleanType, cleanProf));
         return true;
     }
 
-    public boolean deleteSkill(int userSkillId) {
+    public boolean deleteSkill(int userSkillId, int userId) {
+        if (userSkillId <= 0) return false;
         if (DBUtil.isDatabaseAvailable()) {
-            String sql = "DELETE FROM user_skills WHERE id = ?";
+            String sql = (userId > 0) ? "DELETE FROM user_skills WHERE id = ? AND user_id = ?" : "DELETE FROM user_skills WHERE id = ?";
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, userSkillId);
+                if (userId > 0) ps.setInt(2, userId);
                 return ps.executeUpdate() > 0;
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
 
-        return memorySkills.removeIf(us -> us.getId() == userSkillId);
+        return memorySkills.removeIf(us -> us.getId() == userSkillId && (userId <= 0 || us.getUserId() == userId));
+    }
+
+    public boolean deleteSkill(int userSkillId) {
+        return deleteSkill(userSkillId, 0);
     }
 
     public List<UserSkill> getUserSkills(int userId, String skillType) {
+        if (userId <= 0) return new ArrayList<>();
         if (DBUtil.isDatabaseAvailable()) {
             List<UserSkill> list = new ArrayList<>();
             String sql = (skillType != null && !skillType.isEmpty()) ?
-                    "SELECT * FROM user_skills WHERE user_id = ? AND skill_type = ?" :
-                    "SELECT * FROM user_skills WHERE user_id = ?";
+                    "SELECT * FROM user_skills WHERE user_id = ? AND skill_type = ? ORDER BY id ASC" :
+                    "SELECT * FROM user_skills WHERE user_id = ? ORDER BY id ASC";
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, userId);
@@ -130,23 +122,33 @@ public class SkillDAO {
         return res;
     }
 
+    public int getTotalSkillCount() {
+        if (DBUtil.isDatabaseAvailable()) {
+            String sql = "SELECT COUNT(*) FROM user_skills";
+            try (Connection conn = DBUtil.getConnection();
+                 Statement st = conn.createStatement();
+                 ResultSet rs = st.executeQuery(sql)) {
+                if (rs.next()) return rs.getInt(1);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return memorySkills.size();
+    }
+
     public List<MatchResult> searchMentors(String query, int currentUserId) {
         String cleanQuery = (query != null) ? query.trim().toLowerCase() : "";
         List<MatchResult> results = new ArrayList<>();
 
-        List<UserSkill> myTeachSkills = getUserSkills(currentUserId, "TEACH");
-        List<UserSkill> myLearnSkills = getUserSkills(currentUserId, "LEARN");
-
+        List<UserSkill> myTeachSkills = currentUserId > 0 ? getUserSkills(currentUserId, "TEACH") : new ArrayList<>();
         Set<String> myTeachSet = new HashSet<>();
         for (UserSkill s : myTeachSkills) myTeachSet.add(s.getSkillName().toLowerCase());
 
-        Set<String> myLearnSet = new HashSet<>();
-        for (UserSkill s : myLearnSkills) myLearnSet.add(s.getSkillName().toLowerCase());
-
-        List<User> allStudents = userDAO.getAllUsers();
+        List<User> allStudents = userDAO.getStudents();
 
         for (User student : allStudents) {
             if (student.getId() == currentUserId) continue;
+            if (!student.isActive()) continue;
 
             List<UserSkill> studentTeach = getUserSkills(student.getId(), "TEACH");
             List<UserSkill> studentLearn = getUserSkills(student.getId(), "LEARN");
@@ -173,7 +175,7 @@ public class SkillDAO {
                     }
                 }
 
-                int score = 55; // Base compatibility for teaching what was searched
+                int score = 55; // Base compatibility
                 String reason = "Teaches " + matchedSkillName;
 
                 if (!mutualSkills.isEmpty()) {
@@ -182,7 +184,7 @@ public class SkillDAO {
                 } else if (student.getReputationScore() >= 4.8) {
                     score = 75;
                     reason = "Top-rated Mentor in " + matchedSkillName + " (Reputation " + student.getReputationScore() + "/5.0)";
-                } else {
+                } else if (student.getReputationScore() > 0) {
                     score = 65;
                 }
 
@@ -205,6 +207,7 @@ public class SkillDAO {
 
     public List<MatchResult> getReverseMatches(int currentUserId) {
         List<MatchResult> matches = new ArrayList<>();
+        if (currentUserId <= 0) return matches;
 
         List<UserSkill> myTeachSkills = getUserSkills(currentUserId, "TEACH");
         List<UserSkill> myLearnSkills = getUserSkills(currentUserId, "LEARN");
@@ -223,10 +226,11 @@ public class SkillDAO {
             myLearnSet.add(s.getSkillName().toLowerCase());
         }
 
-        List<User> allStudents = userDAO.getAllUsers();
+        List<User> allStudents = userDAO.getStudents();
 
         for (User student : allStudents) {
             if (student.getId() == currentUserId) continue;
+            if (!student.isActive()) continue;
 
             List<UserSkill> studentLearn = getUserSkills(student.getId(), "LEARN");
             List<UserSkill> studentTeach = getUserSkills(student.getId(), "TEACH");

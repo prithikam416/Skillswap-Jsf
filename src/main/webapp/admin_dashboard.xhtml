@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>SkillSwap - Admin Dashboard</title>
+    <h:outputStylesheet library="css" name="style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</h:head>
+
+<h:body>
+    <!-- Admin Access Check -->
+    <h:panelGroup rendered="#{!userBean.admin}">
+        <div class="container" style="max-width: 500px; margin-top: 4rem; text-align: center;">
+            <div class="card" style="padding: 3rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔒</div>
+                <h2 style="color: var(--danger); margin-bottom: 0.75rem;">Access Denied</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    Administrator privileges are required to access this page.
+                </p>
+                <h:link outcome="login" value="Go to Login" styleClass="btn btn-primary" />
+            </div>
+        </div>
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{userBean.admin}">
+        <!-- Admin Navbar -->
+        <header class="navbar">
+            <a href="admin_dashboard.xhtml" class="brand" style="display: flex; align-items: center; gap: 0.5rem;">
+                <img src="images/logo.png" alt="SkillSwap Admin" style="height: 28px; width: auto;" />
+                <span style="font-size: 0.85rem; background: rgba(20, 184, 166, 0.2); color: #2dd4bf; padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 700; border: 1px solid rgba(20, 184, 166, 0.4);">ADMIN</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="admin_dashboard.xhtml" class="active">Dashboard</a></li>
+                <li><a href="admin_users.xhtml">Users</a></li>
+                <li><a href="admin_reports.xhtml">Reports</a></li>
+                <li><a href="leaderboard.xhtml">Leaderboard</a></li>
+                <li>
+                    <h:form style="display:inline; margin:0;">
+                        <h:commandLink action="#{userBean.logout}" value="Logout"
+                                       style="color:#fca5a5; font-weight:600; text-decoration:none; padding:0.4rem 0.8rem;" />
+                    </h:form>
+                </li>
+            </ul>
+        </header>
+
+        <div class="admin-layout">
+            <!-- Sidebar -->
+            <aside class="admin-sidebar">
+                <div class="sidebar-header">
+                    <h3>📊 Admin Panel</h3>
+                    <p>Welcome, #{userBean.currentUser.name}</p>
+                </div>
+                <ul class="sidebar-nav">
+                    <li><a href="admin_dashboard.xhtml" class="active"><span class="nav-icon">📊</span> Dashboard</a></li>
+                    <li><a href="admin_users.xhtml"><span class="nav-icon">👥</span> User Management</a></li>
+                    <li><a href="admin_reports.xhtml"><span class="nav-icon">📋</span> Reports</a></li>
+                    <li><a href="leaderboard.xhtml"><span class="nav-icon">🏆</span> Leaderboard</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="admin-content">
+                <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">Admin Dashboard</h1>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Platform overview and analytics at a glance</p>
+
+                <h:messages globalOnly="true" styleClass="ui-messages"
+                            infoClass="ui-messages-info" errorClass="ui-messages-error" />
+
+                <!-- Statistics Cards -->
+                <div class="admin-stats">
+                    <div class="admin-stat-card">
+                        <div class="stat-icon icon-blue">👥</div>
+                        <div class="stat-info">
+                            <div class="stat-value">#{adminBean.totalStudents}</div>
+                            <div class="stat-label">Total Students</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="stat-icon icon-green">✅</div>
+                        <div class="stat-info">
+                            <div class="stat-value">#{adminBean.activeStudents}</div>
+                            <div class="stat-label">Active Students</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="stat-icon icon-purple">🎯</div>
+                        <div class="stat-info">
+                            <div class="stat-value">#{adminBean.totalSkills}</div>
+                            <div class="stat-label">Skills Listed</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="stat-icon icon-cyan">🔄</div>
+                        <div class="stat-info">
+                            <div class="stat-value">#{adminBean.totalRequests}</div>
+                            <div class="stat-label">Total Requests</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="stat-icon icon-amber">⏳</div>
+                        <div class="stat-info">
+                            <div class="stat-value">#{adminBean.pendingRequests}</div>
+                            <div class="stat-label">Pending Requests</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="stat-icon icon-green">✔️</div>
+                        <div class="stat-info">
+                            <div class="stat-value">#{adminBean.acceptedRequests}</div>
+                            <div class="stat-label">Accepted</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="stat-icon icon-red">✖️</div>
+                        <div class="stat-info">
+                            <div class="stat-value">#{adminBean.rejectedRequests}</div>
+                            <div class="stat-label">Rejected</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="stat-icon icon-red">🚩</div>
+                        <div class="stat-info">
+                            <div class="stat-value">#{adminBean.totalReports}</div>
+                            <div class="stat-label">Reports Submitted</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Section -->
+                <div class="grid-2" style="margin-top: 1.5rem;">
+                    <!-- Skill Popularity -->
+                    <div class="card">
+                        <h3 class="section-title">🎯 Skill Popularity</h3>
+                        <ui:repeat value="#{adminBean.skillPopularity}" var="skill">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.65rem;">
+                                <span style="font-weight: 600; min-width: 120px; font-size: 0.9rem;">#{skill[0]}</span>
+                                <div style="flex: 1; background: var(--border-light); border-radius: 4px; height: 22px; overflow: hidden;">
+                                    <div style="background: linear-gradient(90deg, var(--primary), var(--secondary)); height: 100%; border-radius: 4px; min-width: 30px; width: calc(#{skill[1]} * 20%); display: flex; align-items: center; justify-content: flex-end; padding-right: 6px;">
+                                        <span style="color: #fff; font-size: 0.72rem; font-weight: 700;">#{skill[1]}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </ui:repeat>
+                        <h:panelGroup rendered="#{empty adminBean.skillPopularity}">
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">No skill data available yet.</p>
+                        </h:panelGroup>
+                    </div>
+
+                    <!-- Request Statistics -->
+                    <div class="card">
+                        <h3 class="section-title">📊 Exchange Request Overview</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                            <div style="background: var(--warning-light); padding: 1rem; border-radius: var(--radius); text-align: center;">
+                                <div style="font-size: 1.5rem; font-weight: 800; color: var(--warning);">#{adminBean.pendingRequests}</div>
+                                <div style="font-size: 0.78rem; font-weight: 600; color: var(--warning);">Pending</div>
+                            </div>
+                            <div style="background: var(--success-light); padding: 1rem; border-radius: var(--radius); text-align: center;">
+                                <div style="font-size: 1.5rem; font-weight: 800; color: var(--success);">#{adminBean.acceptedRequests}</div>
+                                <div style="font-size: 0.78rem; font-weight: 600; color: var(--success);">Accepted</div>
+                            </div>
+                            <div style="background: var(--danger-light); padding: 1rem; border-radius: var(--radius); text-align: center;">
+                                <div style="font-size: 1.5rem; font-weight: 800; color: var(--danger);">#{adminBean.rejectedRequests}</div>
+                                <div style="font-size: 0.78rem; font-weight: 600; color: var(--danger);">Rejected</div>
+                            </div>
+                            <div style="background: var(--info-light); padding: 1rem; border-radius: var(--radius); text-align: center;">
+                                <div style="font-size: 1.5rem; font-weight: 800; color: var(--info);">#{adminBean.completedRequests}</div>
+                                <div style="font-size: 0.78rem; font-weight: 600; color: var(--info);">Completed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="grid-2" style="margin-top: 1.5rem;">
+                    <!-- Recent Students -->
+                    <div class="card">
+                        <h3 class="section-title">🆕 Recent Registrations</h3>
+                        <ui:repeat value="#{adminBean.recentStudents}" var="student">
+                            <div class="activity-item">
+                                <div class="activity-icon icon-blue">👤</div>
+                                <div class="activity-info">
+                                    <div class="activity-title">#{student.name}</div>
+                                    <div class="activity-meta">#{student.usn} · #{student.department}</div>
+                                </div>
+                                <span class="badge #{student.active ? 'badge-active' : 'badge-inactive'}">
+                                    #{student.active ? 'Active' : 'Inactive'}
+                                </span>
+                            </div>
+                        </ui:repeat>
+                        <div style="margin-top: 0.75rem;">
+                            <h:link outcome="admin_users" value="View All Students →"
+                                    style="color: var(--primary); font-weight: 600; font-size: 0.88rem;" />
+                        </div>
+                    </div>
+
+                    <!-- Recent Reports -->
+                    <div class="card">
+                        <h3 class="section-title">🚩 Recent Reports</h3>
+                        <ui:repeat value="#{adminBean.recentReports}" var="report">
+                            <div class="activity-item">
+                                <div class="activity-icon icon-red">📋</div>
+                                <div class="activity-info">
+                                    <div class="activity-title">#{report.reporterName} → #{report.reportedName}</div>
+                                    <div class="activity-meta">#{report.reason}</div>
+                                </div>
+                                <span class="badge #{report.status eq 'PENDING' ? 'badge-pending' : report.status eq 'UNDER_REVIEW' ? 'badge-intermediate' : report.status eq 'RESOLVED' ? 'badge-completed' : 'badge-rejected'}">
+                                    #{report.statusLabel}
+                                </span>
+                            </div>
+                        </ui:repeat>
+                        <h:panelGroup rendered="#{empty adminBean.recentReports}">
+                            <p style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem 0;">No reports submitted yet.</p>
+                        </h:panelGroup>
+                        <div style="margin-top: 0.75rem;">
+                            <h:link outcome="admin_reports" value="View All Reports →"
+                                    style="color: var(--primary); font-weight: 600; font-size: 0.88rem;" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Exchange Activities -->
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3 class="section-title">🔄 Recent Exchange Activities</h3>
+                    <h:dataTable value="#{adminBean.recentRequests}" var="req" styleClass="table-custom"
+                                 rendered="#{not empty adminBean.recentRequests}">
+                        <h:column>
+                            <f:facet name="header">Sender</f:facet>
+                            <strong>#{req.senderName}</strong>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Receiver</f:facet>
+                            #{req.receiverName}
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Skill</f:facet>
+                            <span class="badge badge-teach">#{req.skillName}</span>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Status</f:facet>
+                            <span class="badge #{req.status eq 'PENDING' ? 'badge-pending' : req.status eq 'ACCEPTED' ? 'badge-accepted' : req.status eq 'COMPLETED' ? 'badge-completed' : 'badge-rejected'}">
+                                #{req.status}
+                            </span>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Date</f:facet>
+                            <span style="font-size: 0.82rem; color: var(--text-muted);">#{req.createdAt}</span>
+                        </h:column>
+                    </h:dataTable>
+                </div>
+            </main>
+        </div>
+    </h:panelGroup>
+
+    <footer>
+        SkillSwap • Campus Peer-to-Peer Skill Learning &amp; Exchange Platform
+    </footer>
+</h:body>
+</html>

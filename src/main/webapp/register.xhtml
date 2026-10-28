@@ -3,100 +3,237 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 <h:head>
-    <title>SkillSwap - Student Registration</title>
-    <h:outputStylesheet name="css/style.css" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkillSwap - Student Registration</title>
+
+    <!-- Google Fonts & Material Symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                        },
+                        navy: {
+                            800: '#16324F',
+                            900: '#0f2338',
+                            950: '#091522'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        .custom-select option {
+            background-color: #16324F;
+            color: #ffffff;
+        }
+        .field-error-msg {
+            color: #f87171 !important;
+            font-size: 0.8rem !important;
+            font-weight: 600 !important;
+            display: block !important;
+            margin-top: 0.35rem !important;
+        }
+        .ui-messages-error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            padding: 0.85rem 1.25rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.9rem;
+            list-style: none;
+        }
+    </style>
 </h:head>
 
-<h:body>
-    <header class="navbar">
-        <a href="index.xhtml" class="brand">🤝 SkillSwap</a>
-        <ul class="nav-links">
-            <li><a href="index.xhtml">Home</a></li>
-            <li><a href="search.xhtml">Find Mentors</a></li>
-            <li><a href="login.xhtml">Login</a></li>
-            <li><a href="register.xhtml" class="active">Register</a></li>
-        </ul>
-    </header>
+<h:body class="min-h-screen flex flex-col justify-between bg-[#16324F] font-sans text-white">
 
-    <div class="container" style="max-width: 620px; margin-top: 2rem;">
-        <div class="card" style="padding: 2.25rem;">
-            <div style="text-align: center; margin-bottom: 1.5rem;">
-                <span style="font-size: 2.5rem;">📝</span>
-                <h2 style="margin-top: 0.5rem; color: #1e3a8a;">Student Registration</h2>
-                <p style="color: #64748b; font-size: 0.9rem;">Join the campus skill-learning network (Person 1 Module)</p>
-            </div>
-
-            <!-- Messages -->
-            <h:messages globalOnly="true" styleClass="ui-messages"
-                        infoClass="ui-messages-info" errorClass="ui-messages-error" />
-
-            <h:form id="registerForm">
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label for="regUsn">Student USN *</label>
-                        <h:inputText id="regUsn" value="#{userBean.regUsn}"
-                                     styleClass="form-control" required="true"
-                                     requiredMessage="USN is required" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="regName">Full Name *</label>
-                        <h:inputText id="regName" value="#{userBean.regName}"
-                                     styleClass="form-control" required="true"
-                                     requiredMessage="Full name is required" />
-                    </div>
-                </div>
-
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label for="regEmail">College Email *</label>
-                        <h:inputText id="regEmail" value="#{userBean.regEmail}"
-                                     styleClass="form-control" required="true"
-                                     requiredMessage="Email is required" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="regPass">Password *</label>
-                        <h:inputSecret id="regPass" value="#{userBean.regPassword}"
-                                       styleClass="form-control" required="true"
-                                       requiredMessage="Password is required" />
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="regDept">Branch / Department</label>
-                    <h:selectOneMenu id="regDept" value="#{userBean.regDepartment}" styleClass="form-control">
-                        <f:selectItem itemValue="Computer Science &amp; Engineering" itemLabel="Computer Science &amp; Engineering" />
-                        <f:selectItem itemValue="Information Science &amp; Engineering" itemLabel="Information Science &amp; Engineering" />
-                        <f:selectItem itemValue="Artificial Intelligence &amp; Data Science" itemLabel="Artificial Intelligence &amp; Data Science" />
-                        <f:selectItem itemValue="Electronics &amp; Communication" itemLabel="Electronics &amp; Communication" />
-                        <f:selectItem itemValue="Mechanical Engineering" itemLabel="Mechanical Engineering" />
-                        <f:selectItem itemValue="Civil Engineering" itemLabel="Civil Engineering" />
-                    </h:selectOneMenu>
-                </div>
-
-                <div class="form-group">
-                    <label for="regBio">About You / Skill Interests</label>
-                    <h:inputTextarea id="regBio" value="#{userBean.regBio}" rows="3"
-                                     styleClass="form-control" />
-                </div>
-
-                <div style="margin-top: 1.5rem;">
-                    <h:commandButton value="Create Student Account" action="#{userBean.register}"
-                                     styleClass="btn btn-primary" style="width: 100%; padding: 0.75rem;" />
-                </div>
-            </h:form>
-
-            <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: #64748b;">
-                Already have an account? 
-                <h:link outcome="login" value="Log in here" style="color: #2563eb; font-weight: 600;" />
+    <!-- Top Navigation Header -->
+    <header class="w-full bg-[#16324F]/95 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+            <a href="index.xhtml" class="flex items-center gap-3 no-underline group">
+                <img src="images/logo.png" alt="SkillSwap Campus Exchange" class="h-9 w-auto object-contain transition-transform group-hover:scale-105" />
+            </a>
+            <div class="flex items-center gap-6 font-semibold text-white text-[15px]">
+                <a class="hover:text-[#14b8a6] transition-colors" href="index.xhtml">Home</a>
+                <a class="hover:text-[#14b8a6] transition-colors" href="search.xhtml">Find Mentors</a>
+                <a class="hover:text-[#14b8a6] transition-colors" href="login.xhtml">Login</a>
+                <a class="bg-[#14b8a6] text-white font-bold px-5 py-2 rounded-xl hover:bg-white hover:text-[#16324F] transition-all shadow-md shadow-[#14b8a6]/20" href="register.xhtml">Register</a>
             </div>
         </div>
-    </div>
+    </header>
 
-    <footer>
-        SkillSwap Project • Module 1: User Management • NNM24CS126
+    <!-- Main Registration Section -->
+    <main class="flex-1 flex items-center justify-center w-full px-4 py-12 relative overflow-hidden bg-[#16324F]">
+        <!-- Ambient Glowing Background Elements -->
+        <div class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#14b8a6]/20 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#14b8a6]/20 blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/4 right-10 w-64 h-64 rounded-full border-2 border-[#14b8a6]/20 pointer-events-none"></div>
+        <div class="absolute bottom-1/4 left-10 w-48 h-48 rounded-full border-2 border-white/10 pointer-events-none"></div>
+
+        <!-- Glassmorphism Form Card -->
+        <div class="w-full max-w-xl mx-auto my-4 relative z-10">
+            <div class="bg-white/10 backdrop-blur-md border-2 border-white/30 rounded-[32px] p-8 sm:p-11 shadow-2xl flex flex-col items-center">
+                
+                <!-- Icon Badge -->
+                <div class="w-16 h-16 rounded-2xl bg-[#14b8a6]/20 border border-[#14b8a6] flex items-center justify-center mb-4 text-[#14b8a6]">
+                    <span class="material-symbols-outlined text-[32px] text-[#14b8a6]">edit_note</span>
+                </div>
+
+                <h1 class="text-[28px] sm:text-[32px] font-bold text-white text-center font-display tracking-tight mb-2">Student Registration</h1>
+                <p class="text-[15px] text-white/80 text-center mb-7">Join your campus peer learning network to teach and learn new skills</p>
+
+                <!-- Global Server Messages -->
+                <div class="w-full">
+                    <h:messages globalOnly="true" styleClass="ui-messages"
+                                infoClass="ui-messages-info" errorClass="ui-messages-error" />
+                </div>
+
+                <!-- Registration Form -->
+                <h:form id="registrationForm" class="w-full flex flex-col gap-4">
+                    
+                    <!-- USN -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-bold text-white" for="registrationForm:regStudentId">
+                            Student ID / USN <span class="text-[#ef4444] font-bold">*</span>
+                        </label>
+                        <h:inputText id="regStudentId" value="#{userBean.regUsn}"
+                                     class="w-full bg-white/10 border-2 border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/50 text-[15px] focus:outline-none focus:border-[#14b8a6] focus:bg-white/20 transition-all"
+                                     placeholder="e.g. 1MS21CS042" required="true"
+                                     requiredMessage="Student ID / USN is required"
+                                     validatorMessage="Student ID / USN must be at least 3 characters.">
+                            <f:validateLength minimum="3" />
+                        </h:inputText>
+                        <h:message for="regStudentId" styleClass="field-error-msg" />
+                    </div>
+
+                    <!-- Full Name -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-bold text-white" for="registrationForm:regFullName">
+                            Full Name <span class="text-[#ef4444] font-bold">*</span>
+                        </label>
+                        <h:inputText id="regFullName" value="#{userBean.regName}"
+                                     class="w-full bg-white/10 border-2 border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/50 text-[15px] focus:outline-none focus:border-[#14b8a6] focus:bg-white/20 transition-all"
+                                     placeholder="e.g. Rahul Sharma" required="true"
+                                     requiredMessage="Full name is required"
+                                     validatorMessage="Full name must be at least 2 characters.">
+                            <f:validateLength minimum="2" />
+                        </h:inputText>
+                        <h:message for="regFullName" styleClass="field-error-msg" />
+                    </div>
+
+                    <!-- College Email -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-bold text-white" for="registrationForm:regCollegeEmail">
+                            College Email Address <span class="text-[#ef4444] font-bold">*</span>
+                        </label>
+                        <h:inputText id="regCollegeEmail" value="#{userBean.regEmail}"
+                                     class="w-full bg-white/10 border-2 border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/50 text-[15px] focus:outline-none focus:border-[#14b8a6] focus:bg-white/20 transition-all"
+                                     placeholder="rahul.sharma@campus.edu" required="true"
+                                     requiredMessage="College email address is required"
+                                     validatorMessage="Please enter a valid email address (e.g. student@campus.edu)">
+                            <f:validateRegex pattern="^[A-Za-z0-9+_.'-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$" />
+                        </h:inputText>
+                        <h:message for="regCollegeEmail" styleClass="field-error-msg" />
+                    </div>
+
+                    <!-- Department -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-bold text-white" for="registrationForm:regDept">
+                            Branch / Department
+                        </label>
+                        <div class="relative w-full">
+                            <h:selectOneMenu id="regDept" value="#{userBean.regDepartment}"
+                                             class="custom-select w-full bg-white/10 border-2 border-white/30 rounded-xl px-4 py-3 text-white text-[15px] appearance-none focus:outline-none focus:border-[#14b8a6] focus:bg-[#16324F] transition-all">
+                                <f:selectItem itemValue="Computer Science &amp; Engineering" itemLabel="Computer Science &amp; Engineering" />
+                                <f:selectItem itemValue="Information Science &amp; Engineering" itemLabel="Information Science &amp; Engineering" />
+                                <f:selectItem itemValue="Artificial Intelligence &amp; Data Science" itemLabel="Artificial Intelligence &amp; Data Science" />
+                                <f:selectItem itemValue="Electronics &amp; Communication" itemLabel="Electronics &amp; Communication" />
+                                <f:selectItem itemValue="Mechanical Engineering" itemLabel="Mechanical Engineering" />
+                                <f:selectItem itemValue="Civil Engineering" itemLabel="Civil Engineering" />
+                            </h:selectOneMenu>
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-white">
+                                <span class="material-symbols-outlined text-[22px]">expand_more</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-bold text-white" for="registrationForm:regPassword">
+                            Password <span class="text-[#ef4444] font-bold">*</span> <span class="text-white/60 font-normal text-xs">(min 6 chars)</span>
+                        </label>
+                        <h:inputSecret id="regPassword" value="#{userBean.regPassword}"
+                                       class="w-full bg-white/10 border-2 border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/50 text-[15px] focus:outline-none focus:border-[#14b8a6] focus:bg-white/20 transition-all"
+                                       placeholder="At least 6 characters" required="true"
+                                       requiredMessage="Password is required"
+                                       validatorMessage="Password must be at least 6 characters.">
+                            <f:validateLength minimum="6" />
+                        </h:inputSecret>
+                        <h:message for="regPassword" styleClass="field-error-msg" />
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-bold text-white" for="registrationForm:regConfirmPassword">
+                            Confirm Password <span class="text-[#ef4444] font-bold">*</span>
+                        </label>
+                        <h:inputSecret id="regConfirmPassword" value="#{userBean.regConfirmPassword}"
+                                       class="w-full bg-white/10 border-2 border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/50 text-[15px] focus:outline-none focus:border-[#14b8a6] focus:bg-white/20 transition-all"
+                                       placeholder="Re-enter password" required="true"
+                                       requiredMessage="Please confirm your password." />
+                        <h:message for="regConfirmPassword" styleClass="field-error-msg" />
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-3">
+                        <h:commandButton value="Register as Student →" action="#{userBean.register}"
+                                         class="w-full bg-[#14b8a6] hover:bg-white hover:text-[#16324F] text-white font-bold text-[16px] py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 border-2 border-[#14b8a6] transition-all shadow-lg cursor-pointer" />
+                    </div>
+
+                    <!-- Login Link -->
+                    <div class="text-center pt-2">
+                        <p class="text-[14px] text-white/80">
+                            Already have an account? 
+                            <a class="font-bold text-[#14b8a6] hover:underline ml-1" href="login.xhtml">Login here</a>
+                        </p>
+                    </div>
+                </h:form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full bg-[#0f2338] border-t border-white/10 text-white py-5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-[#14b8a6] text-[22px]">handshake</span>
+                <span class="text-[14px] font-bold text-white">SkillSwap Campus Network</span>
+                <span class="text-[#14b8a6]">•</span>
+                <span class="text-[13px] text-white/80">Peer-to-peer campus verification</span>
+            </div>
+            <div class="text-[12px] font-bold text-[#14b8a6] border border-[#14b8a6] px-3 py-1 rounded-lg">ACTIVE NODE: CAMPUS-01</div>
+        </div>
     </footer>
+
 </h:body>
 </html>

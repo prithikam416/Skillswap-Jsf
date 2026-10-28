@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>SkillSwap • Campus Peer Exchange Portal</title>
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  
+  <!-- Material Symbols Outlined -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              200: '#99f6e4',
+              300: '#5eead4',
+              400: '#2dd4bf',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            },
+            navy: {
+              800: '#162d50',
+              850: '#11223f',
+              900: '#0b192c',
+              950: '#060d17',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          boxShadow: {
+            'glow-teal': '0 0 25px -5px rgba(20, 184, 166, 0.3)',
+            'glow-navy': '0 10px 30px -10px rgba(11, 25, 44, 0.4)',
+            'card-hover': '0 12px 30px -8px rgba(15, 23, 42, 0.12)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    @keyframes ping-slow {
+      75%, 100% { transform: scale(2); opacity: 0; }
+    }
+    .animate-ping-slow { animation: ping-slow 2.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
+  </style>
+</head>
+
+<body class="bg-[#F8FAFC] font-sans text-slate-800 antialiased min-h-screen selection:bg-brand-500 selection:text-white">
+
+  <!-- ======================== SIDEBAR ======================== -->
+  <aside id="sidebar" class="fixed left-0 top-0 h-full w-72 bg-gradient-to-b from-[#0B192C] via-[#0F223D] to-[#081220] z-50 flex flex-col justify-between text-white border-r border-slate-800/80 transition-transform duration-300 -translate-x-full lg:translate-x-0 shadow-2xl">
+    <div class="flex flex-col flex-1 overflow-y-auto">
+      
+      <!-- Brand Logo Header -->
+      <div class="h-20 px-6 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/40">
+        <a href="dashboard.xhtml" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-teal-300 flex items-center justify-center shadow-glow-teal group-hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-[#0B192C] font-bold text-24px">swap_calls</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-display font-extrabold text-xl tracking-tight text-white flex items-center gap-1">
+              Skill<span class="text-brand-400">Swap</span>
+            </span>
+            <span class="text-[10px] uppercase font-bold tracking-widest text-brand-300/70">Campus Exchange</span>
+          </div>
+        </a>
+        <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white p-1 rounded-lg">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- Campus Active Node Status (Dynamic) -->
+      <div class="mx-4 my-4 p-3 rounded-xl bg-slate-900/80 border border-slate-800/90 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping-slow absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-500"></span>
+          </div>
+          <div class="flex flex-col">
+            <span id="campusNodeText" class="text-[11px] font-semibold text-slate-200">Campus Node: Connected</span>
+            <span id="peersOnlineText" class="text-[10px] text-slate-400">Real-time Student Exchange</span>
+          </div>
+        </div>
+        <span class="px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-300 border border-brand-500/20 text-[10px] font-mono font-medium">Live</span>
+      </div>
+
+      <!-- Navigation Links -->
+      <div class="px-3 py-2 space-y-6">
+        <div>
+          <p class="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400/80">Platform</p>
+          <nav class="space-y-1">
+            <a href="dashboard.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-brand-500/20 to-teal-500/5 text-brand-300 border border-brand-500/30 font-medium transition-all group shadow-sm">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-brand-400 text-[20px] group-hover:scale-110 transition-transform">grid_view</span>
+                <span class="font-semibold text-sm">Dashboard</span>
+              </div>
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span>
+            </a>
+
+            <a href="search.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all group">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-slate-400 group-hover:text-brand-400 text-[20px] transition-colors">explore</span>
+                <span>Explore Skills</span>
+              </div>
+            </a>
+
+            <a href="skills.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all group">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-slate-400 group-hover:text-brand-400 text-[20px] transition-colors">swap_horiz</span>
+                <span>My Skill Inventory</span>
+              </div>
+              <span id="navSkillCount" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[11px] font-mono">0</span>
+            </a>
+
+            <a href="#requestsSection" onclick="scrollToSection('requestsSection')" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all group">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-slate-400 group-hover:text-brand-400 text-[20px] transition-colors">pending_actions</span>
+                <span>Learning Requests</span>
+              </div>
+              <span id="navPendingBadge" class="px-2 py-0.5 rounded-full bg-gradient-to-r from-brand-500 to-teal-400 text-slate-950 font-bold text-[11px] leading-tight shadow-sm">0 pending</span>
+            </a>
+
+            <a href="#sessionsSection" onclick="scrollToSection('sessionsSection')" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all group">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-slate-400 group-hover:text-brand-400 text-[20px] transition-colors">calendar_month</span>
+                <span>Sessions &amp; Calendar</span>
+              </div>
+              <span id="navConfirmedDot" class="w-2 h-2 rounded-full bg-brand-400"></span>
+            </a>
+          </nav>
+        </div>
+
+        <div>
+          <p class="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400/80">Community &amp; Trust</p>
+          <nav class="space-y-1">
+            <a href="leaderboard.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all group">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-slate-400 group-hover:text-amber-400 text-[20px] transition-colors">trophy</span>
+                <span>Leaderboard</span>
+              </div>
+              <span id="navRankBadge" class="text-amber-400 text-xs font-mono font-semibold">Rank #1</span>
+            </a>
+
+            <a href="reputation.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all group">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-slate-400 group-hover:text-brand-400 text-[20px] transition-colors">verified_user</span>
+                <span>Reputation &amp; Ratings</span>
+              </div>
+            </a>
+
+            <a href="profile.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-all group">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-slate-400 group-hover:text-brand-400 text-[20px] transition-colors">badge</span>
+                <span>My Profile</span>
+              </div>
+            </a>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="p-4 bg-slate-950/60 border-t border-slate-800/80 space-y-3">
+      <div class="flex items-center gap-3 p-2 rounded-xl bg-slate-900/60 border border-slate-800">
+        <div id="sidebarAvatar" class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm">
+          --
+        </div>
+        <div class="flex-1 min-w-0">
+          <p id="sidebarUserName" class="text-xs font-semibold text-white truncate">Student</p>
+          <p id="sidebarUserUSN" class="text-[11px] text-brand-300 font-mono truncate">USN: --</p>
+        </div>
+        <button onclick="openModal('switchStudentModal')" title="Edit Student Profile" class="text-slate-400 hover:text-brand-300 p-1.5 rounded-lg hover:bg-slate-800 transition-colors">
+          <span class="material-symbols-outlined text-[18px]">manage_accounts</span>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between px-1 text-[11px] text-slate-500">
+        <a href="login.xhtml" class="hover:text-slate-400 flex items-center gap-1 transition-colors">
+          <span class="material-symbols-outlined text-[14px]">login</span> JSF Portal Login
+        </a>
+        <span>JSF 2.2 • Active</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile Sidebar Overlay -->
+  <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity"></div>
+
+  <!-- ======================== MAIN WRAPPER ======================== -->
+  <div class="lg:pl-72 flex flex-col min-h-screen">
+    
+    <!-- ======================== TOP NAVBAR ======================== -->
+    <header class="sticky top-0 z-30 h-16 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between transition-shadow">
+      
+      <!-- Mobile hamburger & Live Dynamic Search -->
+      <div class="flex items-center gap-3 sm:gap-4 flex-1 max-w-xl">
+        <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+          <span class="material-symbols-outlined text-[24px]">menu</span>
+        </button>
+
+        <!-- Live Instant Search Bar -->
+        <div class="relative w-full">
+          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+          <input 
+            id="searchInput"
+            oninput="handleSearch(this.value)"
+            type="text" 
+            placeholder="Search skills, peers, or barter topics..." 
+            class="w-full pl-10 pr-10 py-2 rounded-xl bg-slate-100/90 hover:bg-slate-100 focus:bg-white text-sm text-slate-800 placeholder-slate-400 border border-transparent focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 focus:outline-none transition-all shadow-inner"
+          />
+          <kbd class="hidden sm:inline-flex absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-white border border-slate-200 rounded shadow-xs">⌘K</kbd>
+
+          <!-- Autocomplete Dropdown Preview (Dynamically Generated) -->
+          <div id="searchDropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200/90 p-3 z-50">
+            <div class="p-2 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Instant Filter Results</div>
+            <div id="searchResultsList" class="space-y-1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Header Actions -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        
+        <!-- Dynamic Pod Token / Check-in Button -->
+        <button onclick="openPodModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 transition-all hover:scale-[1.02]">
+          <span class="material-symbols-outlined text-[18px] text-brand-600">qr_code_2</span>
+          <span class="hidden sm:inline">Session Token</span>
+        </button>
+
+        <!-- Notification Bell -->
+        <div class="relative">
+          <button 
+            onclick="toggleDropdown('notificationsDropdown')"
+            aria-label="Notifications" 
+            class="relative p-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all focus:outline-none"
+          >
+            <span class="material-symbols-outlined text-[22px]">notifications</span>
+            <span id="notifBadge" class="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-brand-500 ring-2 ring-white hidden"></span>
+          </button>
+
+          <!-- Notification Menu -->
+          <div id="notificationsDropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 z-50">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <span class="font-display font-bold text-slate-900 text-sm">Notifications &amp; Activity</span>
+              <button onclick="clearNotifications()" class="text-xs text-brand-600 hover:underline font-semibold">Clear all</button>
+            </div>
+            <div id="notifList" class="divide-y divide-slate-100 max-h-72 overflow-y-auto"></div>
+          </div>
+        </div>
+
+        <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+
+        <!-- Student Profile Pill -->
+        <div class="relative">
+          <button 
+            onclick="toggleDropdown('profileDropdown')"
+            class="flex items-center gap-3 p-1.5 sm:px-2.5 rounded-xl hover:bg-slate-100 transition-colors focus:outline-none"
+          >
+            <div class="relative">
+              <div id="headerAvatar" class="w-9 h-9 rounded-full bg-gradient-to-tr from-navy-800 to-brand-600 flex items-center justify-center text-white font-bold text-sm shadow-sm ring-2 ring-brand-500/20">
+                --
+              </div>
+              <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+            </div>
+            <div class="hidden md:flex flex-col text-left">
+              <div class="flex items-center gap-1.5">
+                <span id="headerName" class="font-display font-bold text-slate-900 text-xs">Student</span>
+                <span id="headerTier" class="px-1.5 py-0.2 rounded bg-brand-50 text-brand-700 text-[10px] font-bold">Peer Tutor</span>
+              </div>
+              <span id="headerUSN" class="text-[11px] text-slate-500 font-mono">--</span>
+            </div>
+            <span class="material-symbols-outlined text-slate-400 text-[18px] hidden md:block">expand_more</span>
+          </button>
+
+          <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 z-50">
+            <div class="px-3 py-2 border-b border-slate-100">
+              <p id="menuName" class="text-xs font-semibold text-slate-800">Student</p>
+              <p id="menuDept" class="text-[11px] text-slate-500">Department</p>
+            </div>
+            <div class="py-1">
+              <button onclick="openModal('switchStudentModal'); toggleDropdown('profileDropdown');" class="w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-brand-600 transition-colors">
+                <span class="material-symbols-outlined text-[18px]">edit</span> Edit Student Profile
+              </button>
+              <a href="profile.xhtml" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-brand-600 transition-colors">
+                <span class="material-symbols-outlined text-[18px]">person</span> Full Profile Page
+              </a>
+              <a href="dashboard.xhtml" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-brand-600 transition-colors">
+                <span class="material-symbols-outlined text-[18px]">sync</span> Open JSF Backend View
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- ======================== MAIN CONTENT ======================== -->
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-8">
+
+      <!-- ==================== HERO WELCOME BANNER ==================== -->
+      <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0B192C] via-[#112746] to-[#0A3342] text-white p-6 sm:p-8 lg:p-10 shadow-glow-navy border border-slate-800">
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+          
+          <div class="space-y-4 max-w-2xl">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/15 border border-brand-400/30 text-brand-300 text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-400"></span>
+              </span>
+              Verified Campus Node Active
+            </div>
+
+            <div>
+              <h1 id="heroWelcomeTitle" class="font-display font-extrabold text-2xl sm:text-3xl lg:text-4xl tracking-tight text-white leading-tight">
+                Welcome back, Student!
+              </h1>
+              <p id="heroSubtitle" class="text-slate-300 text-sm sm:text-base mt-1.5 font-normal leading-relaxed">
+                Loading student academic profile...
+              </p>
+            </div>
+
+            <!-- Dynamic Academic Meta Badges -->
+            <div class="flex flex-wrap items-center gap-2.5 pt-2">
+              <div class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-medium backdrop-blur-md transition-all">
+                <span class="material-symbols-outlined text-brand-400 text-[18px]">verified</span>
+                <span>Reputation: <strong id="heroPoints" class="text-brand-300 font-bold">0 pts</strong></span>
+              </div>
+
+              <div class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-medium backdrop-blur-md transition-all">
+                <span class="material-symbols-outlined text-amber-400 text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span>Avg Rating: <strong id="heroRating" class="text-amber-300 font-bold">5.0 / 5.0</strong></span>
+                <span id="heroRatingCount" class="text-slate-400 text-[11px]">(0 reviews)</span>
+              </div>
+
+              <div class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-medium backdrop-blur-md transition-all">
+                <span class="material-symbols-outlined text-indigo-400 text-[18px]">leaderboard</span>
+                <span>Campus Rank: <strong id="heroRank" class="text-indigo-300 font-bold">#1</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
+            <button 
+              onclick="openModal('teachModal')"
+              class="flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-brand-500 to-teal-400 hover:from-brand-600 hover:to-teal-500 text-slate-950 font-display font-bold text-sm shadow-glow-teal hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+            >
+              <span class="material-symbols-outlined text-[20px] font-bold">school</span>
+              <span>Teach a New Skill</span>
+            </button>
+
+            <button 
+              onclick="scrollToSection('requestsSection')"
+              class="flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-display font-semibold text-sm backdrop-blur-md hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+            >
+              <span class="material-symbols-outlined text-[20px] text-brand-300">explore</span>
+              <span>Review Exchange Queue</span>
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== 4 DYNAMIC METRIC KPI STAT CARDS ==================== -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        
+        <!-- Card 1: Skills Offered -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 flex flex-col justify-between hover:shadow-card-hover hover:border-brand-300 transition-all group">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Skills Offered</span>
+              <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+                <span class="material-symbols-outlined text-[20px]">handshake</span>
+              </div>
+            </div>
+            <div id="kpiSkillsCount" class="font-display font-extrabold text-3xl text-slate-900 tracking-tight mb-2">0 Active</div>
+            <p class="text-xs text-slate-500">Ready to mentor peers</p>
+          </div>
+
+          <div id="kpiSkillsChips" class="pt-4 border-t border-slate-100 flex flex-wrap gap-1.5 mt-3">
+            <span class="text-xs text-slate-400 italic">No skills added yet</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Active Requests -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 flex flex-col justify-between hover:shadow-card-hover hover:border-brand-300 transition-all group">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Active Requests</span>
+              <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+                <span class="material-symbols-outlined text-[20px]">swap_calls</span>
+              </div>
+            </div>
+            <div id="kpiRequestsCount" class="font-display font-extrabold text-3xl text-slate-900 tracking-tight mb-2">0 Pending</div>
+            <p class="text-xs text-slate-500">Awaiting peer response</p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-medium mt-3">
+            <span id="kpiIncomingCount" class="inline-flex items-center gap-1.5 text-brand-700 font-semibold bg-brand-50 px-2.5 py-0.5 rounded-full">
+              0 Incoming
+            </span>
+            <span id="kpiOutgoingCount" class="text-slate-500 font-normal">0 Sent Out</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Sessions Exchanged -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 flex flex-col justify-between hover:shadow-card-hover hover:border-brand-300 transition-all group">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Sessions Completed</span>
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+                <span class="material-symbols-outlined text-[20px]">task_alt</span>
+              </div>
+            </div>
+            <div id="kpiCompletedCount" class="font-display font-extrabold text-3xl text-slate-900 tracking-tight mb-2">0 Exchanged</div>
+            <p class="text-xs text-slate-500">Verified peer learning sessions</p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600 mt-3">
+            <span id="kpiConfirmedSessions">0 Upcoming</span>
+            <span id="kpiCompletedSessions">0 Completed</span>
+          </div>
+        </div>
+
+        <!-- Card 4: Reputation Tier -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 flex flex-col justify-between hover:shadow-card-hover hover:border-brand-300 transition-all group">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Reputation Tier</span>
+              <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+              </div>
+            </div>
+            <div id="kpiRepTierName" class="font-display font-extrabold text-2xl text-slate-900 tracking-tight mb-1">Peer Tutor</div>
+            <p class="text-xs text-brand-600 font-semibold">Campus Accreditation</p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 mt-3 space-y-1.5">
+            <div class="flex justify-between text-[11px] text-slate-500 font-medium">
+              <span>Next Milestone</span>
+              <span id="kpiTierPercent" class="text-brand-600 font-bold">100%</span>
+            </div>
+            <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+              <div id="kpiTierBar" class="h-full bg-gradient-to-r from-brand-500 to-teal-400 rounded-full w-full transition-all duration-500"></div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================== 2-COLUMN MAIN DASHBOARD ==================== -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- LEFT COLUMN (8 Columns): Sessions, Requests, Skills Matrix -->
+        <div class="lg:col-span-8 space-y-8">
+          
+          <!-- UPCOMING SESSIONS CARD -->
+          <section id="sessionsSection" class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-brand-500/10 text-brand-600 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[22px]">calendar_month</span>
+                </div>
+                <div>
+                  <h2 class="font-display font-bold text-lg text-slate-900">Upcoming Learning Sessions</h2>
+                  <p class="text-xs text-slate-500">Scheduled 1-on-1 peer exchange meetups</p>
+                </div>
+              </div>
+
+              <!-- Filter Tabs -->
+              <div class="flex items-center gap-1 p-1 bg-slate-100 rounded-xl text-xs font-semibold">
+                <button id="tabAll" onclick="setSessionFilter('ALL')" class="px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs transition-all">All</button>
+                <button id="tabTeaching" onclick="setSessionFilter('TEACHING')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all">Teaching</button>
+                <button id="tabLearning" onclick="setSessionFilter('LEARNING')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all">Learning</button>
+              </div>
+            </div>
+
+            <!-- Sessions Dynamic List -->
+            <div id="sessionsContainer" class="p-6 space-y-4"></div>
+          </section>
+
+          <!-- LEARNING REQUESTS & INQUIRIES FEED -->
+          <section id="requestsSection" class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[22px]">mark_email_unread</span>
+                </div>
+                <div>
+                  <h2 class="font-display font-bold text-lg text-slate-900">Learning Requests &amp; Inquiries</h2>
+                  <p class="text-xs text-slate-500">Real-time barter proposals from verified peers</p>
+                </div>
+              </div>
+              <span id="requestsQueueBadge" class="px-3 py-1 rounded-full bg-brand-50 text-brand-700 text-xs font-semibold border border-brand-200">
+                0 In Queue
+              </span>
+            </div>
+
+            <div id="requestsContainer" class="p-6 space-y-6"></div>
+          </section>
+
+          <!-- SKILLS INVENTORY & BARTER MATRIX -->
+          <section class="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+              <div>
+                <h2 class="font-display font-bold text-lg text-slate-900">Skills Inventory &amp; Barter Matrix</h2>
+                <p class="text-xs text-slate-500">Your balanced peer-learning exchange portfolio</p>
+              </div>
+              <button onclick="openModal('teachModal')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-brand-50 hover:text-brand-700 hover:border-brand-200 text-slate-700 text-xs font-semibold border border-slate-200 transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">add_circle</span>
+                <span>Add Skill</span>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <!-- Skills I Can Teach Column -->
+              <div class="p-5 rounded-2xl bg-slate-50/70 border border-slate-200/80 space-y-4">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-brand-500"></span>
+                    <h3 class="font-display font-bold text-sm text-slate-900">Skills I Can Teach</h3>
+                  </div>
+                  <span id="teachCountBadge" class="text-xs text-slate-400 font-mono">0 Skills</span>
+                </div>
+                <div id="teachSkillsList" class="space-y-2.5"></div>
+              </div>
+
+              <!-- Skills I Want to Learn Column -->
+              <div class="p-5 rounded-2xl bg-slate-50/70 border border-slate-200/80 space-y-4">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                    <h3 class="font-display font-bold text-sm text-slate-900">Skills I Want to Learn</h3>
+                  </div>
+                  <span id="learnCountBadge" class="text-xs text-slate-400 font-mono">0 Targets</span>
+                </div>
+                <div id="learnSkillsList" class="space-y-2.5"></div>
+              </div>
+
+            </div>
+          </section>
+
+        </div>
+
+        <!-- RIGHT COLUMN (4 Columns): Matches, Leaderboard, Validation -->
+        <div class="lg:col-span-4 space-y-8">
+          
+          <!-- RECOMMENDED MATCHES (AI RECIPROCITY) -->
+          <section class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-100 bg-slate-50/50">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[18px]">psychology</span>
+                  </div>
+                  <div>
+                    <h2 class="font-display font-bold text-sm text-slate-900">Recommended Matches</h2>
+                    <p class="text-[11px] text-slate-500">AI-suggested barter reciprocity</p>
+                  </div>
+                </div>
+                <span id="matchCountBadge" class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
+                  Dynamic
+                </span>
+              </div>
+            </div>
+
+            <div id="recommendedMatchesContainer" class="p-5 space-y-4"></div>
+          </section>
+
+          <!-- CAMPUS LEADERBOARD -->
+          <section class="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-5 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[18px]">emoji_events</span>
+                </div>
+                <div>
+                  <h2 class="font-display font-bold text-sm text-slate-900">Top Campus Mentors</h2>
+                  <p class="text-[11px] text-slate-500">Academic Standing</p>
+                </div>
+              </div>
+              <a href="leaderboard.xhtml" class="text-xs text-brand-600 hover:underline font-semibold">View All</a>
+            </div>
+
+            <div id="leaderboardList" class="space-y-2"></div>
+          </section>
+
+          <!-- JSF LEDGER VALIDATION & QR NOTICE -->
+          <section class="bg-gradient-to-br from-slate-900 to-navy-900 rounded-3xl p-5 text-white shadow-sm border border-slate-800 space-y-3">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[20px]">verified_user</span>
+              </div>
+              <div class="space-y-1">
+                <h3 class="font-display font-bold text-xs text-white">JSF Ledger Validation</h3>
+                <p class="text-[11px] text-slate-300 leading-relaxed">
+                  Peer-to-peer exchange credits update in real-time upon QR session validation at campus study pods.
+                </p>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] font-mono">
+              <span class="text-emerald-400 font-semibold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> STATUS: RUNNING
+              </span>
+              <a href="dashboard.xhtml" class="text-brand-300 hover:underline text-xs">Switch to JSF View →</a>
+            </div>
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ======================== MODALS & TOASTS ======================== -->
+
+  <!-- 1. TEACH A NEW SKILL MODAL -->
+  <div id="teachModal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-5 animate-in fade-in zoom-in-95 duration-150">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">school</span>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-lg text-slate-900">Add Skill to Inventory</h3>
+            <p class="text-xs text-slate-500">Update your peer exchange offerings</p>
+          </div>
+        </div>
+        <button onclick="closeModal('teachModal')" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form onsubmit="handleSkillSubmit(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Skill Title / Topic *</label>
+          <input id="skillTitle" required type="text" placeholder="e.g. Python, Docker, UI/UX, Data Structures" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 text-slate-800 text-xs focus:outline-none"/>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Category Type *</label>
+            <select id="skillCategoryType" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 text-slate-800 text-xs focus:outline-none bg-white">
+              <option value="TEACH">Skills I Can Teach (Offered)</option>
+              <option value="LEARN">Skills I Want to Learn (Wanted)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Proficiency Level *</label>
+            <select id="skillLevel" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 text-slate-800 text-xs focus:outline-none bg-white">
+              <option value="Advanced">Advanced (Mentor level)</option>
+              <option value="Intermediate">Intermediate (Hands-on ready)</option>
+              <option value="Beginner">Beginner (Fundamentals)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Learning Target / Notes</label>
+          <input id="skillNotes" type="text" placeholder="e.g. Preparing for coding round or portfolio projects" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 text-slate-800 text-xs focus:outline-none"/>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end gap-3">
+          <button type="button" onclick="closeModal('teachModal')" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold transition-colors cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold transition-all shadow-sm cursor-pointer">
+            Add to Portfolio
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. EDIT STUDENT PROFILE MODAL -->
+  <div id="switchStudentModal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <h3 class="font-display font-bold text-base text-slate-900">Edit Student Identity</h3>
+        <button onclick="closeModal('switchStudentModal')" class="text-slate-400 hover:text-slate-600 p-1">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form onsubmit="handleProfileUpdate(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Student Full Name *</label>
+          <input id="inputProfileName" required type="text" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500" />
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">USN / Campus ID *</label>
+          <input id="inputProfileUSN" required type="text" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500 font-mono" />
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Department / Branch</label>
+          <input id="inputProfileDept" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500" />
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Student Bio</label>
+          <input id="inputProfileBio" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-500" />
+        </div>
+
+        <div class="pt-3 flex justify-end gap-2">
+          <button type="button" onclick="closeModal('switchStudentModal')" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-500 text-white font-semibold">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. SESSION TOKEN MODAL -->
+  <div id="qrModal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <span class="font-display font-bold text-sm text-slate-900">Campus Study Pod Token</span>
+        <button onclick="closeModal('qrModal')" class="text-slate-400 hover:text-slate-600 p-1">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 inline-block mx-auto">
+        <div id="qrTokenDisplay" class="font-mono text-xs font-bold text-slate-800 bg-white p-4 rounded-xl border border-slate-200">
+          GENERATING...
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <p class="text-[11px] text-slate-500">Present this token at the library study pod scanner for peer attendance validation.</p>
+      </div>
+
+      <button onclick="copyPodToken()" class="w-full py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs">
+        Copy Token
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- ======================== DYNAMIC REACTIVE SCRIPT ======================== -->
+  <script>
+    // -------------------------------------------------------------
+    // Dynamic State Management (Zero Mock Data)
+    // -------------------------------------------------------------
+    const defaultState = {
+      user: {
+        name: "Student Mentor",
+        usn: "USN-2026-001",
+        dept: "Computer Science & Engineering",
+        bio: "Eager to teach what I know and learn new technologies.",
+        points: 0,
+        rating: 5.0,
+        ratingCount: 0
+      },
+      skills: [
+        { id: 1, name: "Python Core", type: "TEACH", level: "Advanced", notes: "OOP & Decorators" },
+        { id: 2, name: "Data Structures", type: "TEACH", level: "Advanced", notes: "Trees & Graphs" },
+        { id: 3, name: "UI/UX Figma", type: "LEARN", level: "Beginner", notes: "Design Systems" },
+        { id: 4, name: "Docker", type: "LEARN", level: "Intermediate", notes: "Containers" }
+      ],
+      sessions: [],
+      requests: [
+        {
+          id: 101,
+          type: "INCOMING",
+          sender: "Aditya Verma",
+          receiver: "Student Mentor",
+          skill: "Data Structures",
+          message: "Hey! Can you mentor me on Tree Traversals? Willing to swap for Docker tips.",
+          status: "PENDING",
+          createdAt: "Just now"
+        }
+      ],
+      availablePeers: [
+        { name: "Prithika Sen", dept: "CSE Dept", teaches: "Python, FastAPI", wants: "UI/UX", rating: 5.0 },
+        { name: "Kavya Patel", dept: "Design Dept", teaches: "UI/UX Figma", wants: "Python Core", rating: 4.9 },
+        { name: "Aman Gupta", dept: "Electronics", teaches: "IoT, Arduino", wants: "Data Structures", rating: 4.8 }
+      ],
+      notifications: []
+    };
+
+    function loadState() {
+      const stored = localStorage.getItem('skillswap_dynamic_state');
+      if (stored) {
+        try { return JSON.parse(stored); } catch (e) { /* fallback */ }
+      }
+      return defaultState;
+    }
+
+    function saveState() {
+      localStorage.setItem('skillswap_dynamic_state', JSON.stringify(appState));
+      renderAll();
+    }
+
+    let appState = loadState();
+    let currentSessionFilter = 'ALL';
+
+    // -------------------------------------------------------------
+    // Render Functions
+    // -------------------------------------------------------------
+    function renderAll() {
+      renderUserProfile();
+      renderKPIs();
+      renderSessions();
+      renderRequests();
+      renderSkills();
+      renderRecommendedMatches();
+      renderLeaderboard();
+      renderNotifications();
+    }
+
+    function renderUserProfile() {
+      const u = appState.user;
+      const initials = u.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'ST';
+      
+      document.getElementById('sidebarAvatar').innerText = initials;
+      document.getElementById('headerAvatar').innerText = initials;
+      document.getElementById('sidebarUserName').innerText = u.name;
+      document.getElementById('sidebarUserUSN').innerText = u.usn;
+      document.getElementById('headerName').innerText = u.name;
+      document.getElementById('headerUSN').innerText = u.usn;
+      document.getElementById('menuName').innerText = u.name;
+      document.getElementById('menuDept').innerText = u.dept;
+      document.getElementById('heroWelcomeTitle').innerText = `Welcome back, ${u.name}!`;
+      document.getElementById('heroSubtitle').innerText = `${u.dept} • Campus ID: ${u.usn} • Active Campus Node`;
+      document.getElementById('heroPoints').innerText = `${u.points} pts`;
+      document.getElementById('heroRating').innerText = `${u.rating.toFixed(1)} / 5.0`;
+      document.getElementById('heroRatingCount').innerText = `(${u.ratingCount} reviews)`;
+
+      // Rank
+      const rank = u.points > 100 ? 1 : (u.points > 0 ? 2 : 3);
+      document.getElementById('heroRank').innerText = `#${rank}`;
+      document.getElementById('navRankBadge').innerText = `Rank #${rank}`;
+
+      // Tier calculation
+      let tier = "Junior Mentor";
+      let percent = 50;
+      if (u.points >= 200) { tier = "Master Mentor (L5)"; percent = 100; }
+      else if (u.points >= 100) { tier = "Campus Mentor (L4)"; percent = 80; }
+      else if (u.points >= 40) { tier = "Verified Peer Tutor (L3)"; percent = 65; }
+
+      document.getElementById('headerTier').innerText = tier;
+      document.getElementById('kpiRepTierName').innerText = tier;
+      document.getElementById('kpiTierPercent').innerText = `${percent}%`;
+      document.getElementById('kpiTierBar').style.width = `${percent}%`;
+    }
+
+    function renderKPIs() {
+      const teachSkills = appState.skills.filter(s => s.type === 'TEACH');
+      const pendingReqs = appState.requests.filter(r => r.status === 'PENDING');
+      const incomingReqs = pendingReqs.filter(r => r.type === 'INCOMING');
+      const outgoingReqs = pendingReqs.filter(r => r.type === 'OUTGOING');
+      const completedSessions = appState.sessions.filter(s => s.status === 'COMPLETED');
+      const confirmedSessions = appState.sessions.filter(s => s.status === 'CONFIRMED');
+
+      // Card 1
+      document.getElementById('kpiSkillsCount').innerText = `${teachSkills.length} Active`;
+      document.getElementById('navSkillCount').innerText = `${teachSkills.length}`;
+      const chipsContainer = document.getElementById('kpiSkillsChips');
+      if (teachSkills.length === 0) {
+        chipsContainer.innerHTML = `<span class="text-xs text-slate-400 italic">No teaching skills listed</span>`;
+      } else {
+        chipsContainer.innerHTML = teachSkills.map(s => `
+          <span class="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-700 text-xs font-semibold">${escapeHtml(s.name)}</span>
+        `).join('');
+      }
+
+      // Card 2
+      document.getElementById('kpiRequestsCount').innerText = `${pendingReqs.length} Pending`;
+      document.getElementById('navPendingBadge').innerText = `${pendingReqs.length} pending`;
+      document.getElementById('kpiIncomingCount').innerText = `${incomingReqs.length} Incoming`;
+      document.getElementById('kpiOutgoingCount').innerText = `${outgoingReqs.length} Sent Out`;
+
+      // Card 3
+      document.getElementById('kpiCompletedCount').innerText = `${completedSessions.length} Exchanged`;
+      document.getElementById('kpiConfirmedSessions').innerText = `${confirmedSessions.length} Upcoming`;
+      document.getElementById('kpiCompletedSessions').innerText = `${completedSessions.length} Completed`;
+    }
+
+    function renderSessions() {
+      const container = document.getElementById('sessionsContainer');
+      let filtered = appState.sessions;
+
+      if (currentSessionFilter === 'TEACHING') {
+        filtered = filtered.filter(s => s.role === 'Teaching');
+      } else if (currentSessionFilter === 'LEARNING') {
+        filtered = filtered.filter(s => s.role === 'Learning');
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 px-4 border border-dashed border-slate-200 rounded-2xl">
+            <span class="material-symbols-outlined text-slate-300 text-[36px] mb-2">event_available</span>
+            <p class="text-xs font-semibold text-slate-600">No scheduled sessions in this view.</p>
+            <p class="text-[11px] text-slate-400 mt-1">Accept an incoming request or send a barter proposal to book a 1-on-1 session!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(s => `
+        <div class="p-5 rounded-2xl border border-slate-200/90 bg-white hover:border-brand-400/80 hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div class="space-y-2.5">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full ${s.status === 'COMPLETED' ? 'bg-slate-100 text-slate-600' : 'bg-emerald-50 text-emerald-700'} text-[11px] font-bold uppercase tracking-wide">
+                ${s.status}
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full bg-brand-50 text-brand-700 text-[11px] font-semibold">
+                Role: ${escapeHtml(s.role)}
+              </span>
+            </div>
+            <h3 class="font-display font-bold text-base sm:text-lg text-slate-900">${escapeHtml(s.skill)}</h3>
+            <p class="text-xs text-slate-600">Partner: <strong class="text-slate-900">${escapeHtml(s.partner)}</strong> • Scheduled: ${escapeHtml(s.time)}</p>
+          </div>
+          <div class="flex flex-row md:flex-col gap-2 shrink-0">
+            ${s.status !== 'COMPLETED' ? `
+              <button onclick="markSessionCompleted(${s.id})" class="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs transition-colors cursor-pointer">
+                Mark Completed
+              </button>
+            ` : `
+              <span class="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold text-center">Session Verified</span>
+            `}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderRequests() {
+      const container = document.getElementById('requestsContainer');
+      const pending = appState.requests.filter(r => r.status === 'PENDING');
+      document.getElementById('requestsQueueBadge').innerText = `${pending.length} In Queue`;
+
+      if (pending.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 px-4 border border-dashed border-slate-200 rounded-2xl">
+            <span class="material-symbols-outlined text-slate-300 text-[36px] mb-2">mark_email_read</span>
+            <p class="text-xs font-semibold text-slate-600">Your exchange queue is clear.</p>
+            <p class="text-[11px] text-slate-400 mt-1">Browse recommended peer matches to propose an exchange!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = pending.map(r => `
+        <div class="p-5 rounded-2xl border ${r.type === 'INCOMING' ? 'border-2 border-brand-500/20 bg-gradient-to-br from-white to-brand-50/30' : 'border-slate-200 bg-white'} space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="px-2.5 py-0.5 rounded-full ${r.type === 'INCOMING' ? 'bg-navy-800 text-white' : 'bg-slate-100 text-slate-700'} text-[10px] font-bold uppercase tracking-wider">
+              ${r.type === 'INCOMING' ? 'Incoming Proposal' : 'Outgoing Proposal'}
+            </span>
+            <span class="text-xs text-slate-400 font-mono">${r.createdAt}</span>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-slate-900">
+              ${r.type === 'INCOMING' ? `<strong>${escapeHtml(r.sender)}</strong> requested to learn: <span class="text-brand-600 underline">${escapeHtml(r.skill)}</span>` : `Requested <strong>‘${escapeHtml(r.skill)}’</strong> from <strong>${escapeHtml(r.receiver)}</strong>`}
+            </p>
+            <blockquote class="p-3 bg-white rounded-xl border border-slate-200 text-xs text-slate-600 italic mt-2">
+              “${escapeHtml(r.message)}”
+            </blockquote>
+          </div>
+
+          <div class="flex items-center gap-2 pt-1">
+            ${r.type === 'INCOMING' ? `
+              <button onclick="acceptProposal(${r.id})" class="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs transition-colors cursor-pointer">
+                ✓ Accept &amp; Schedule
+              </button>
+              <button onclick="declineProposal(${r.id})" class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 font-medium text-xs transition-colors cursor-pointer">
+                Decline
+              </button>
+            ` : `
+              <button onclick="withdrawProposal(${r.id})" class="px-3 py-1.5 rounded-lg border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-semibold cursor-pointer">
+                Withdraw Request
+              </button>
+            `}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderSkills() {
+      const teachList = appState.skills.filter(s => s.type === 'TEACH');
+      const learnList = appState.skills.filter(s => s.type === 'LEARN');
+
+      document.getElementById('teachCountBadge').innerText = `${teachList.length} Skills`;
+      document.getElementById('learnCountBadge').innerText = `${learnList.length} Targets`;
+
+      document.getElementById('teachSkillsList').innerHTML = teachList.length === 0 
+        ? `<p class="text-xs text-slate-400 italic py-2">No skills listed to teach yet.</p>`
+        : teachList.map(s => `
+          <div class="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between hover:border-brand-300 transition-colors">
+            <div>
+              <div class="text-xs font-bold text-slate-900">${escapeHtml(s.name)}</div>
+              <div class="text-[11px] text-slate-500">${escapeHtml(s.notes || 'Ready to teach')}</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 text-[10px] font-bold">${escapeHtml(s.level)}</span>
+              <button onclick="deleteSkill(${s.id})" title="Remove Skill" class="text-slate-400 hover:text-rose-600 text-xs font-bold px-1">✕</button>
+            </div>
+          </div>
+        `).join('');
+
+      document.getElementById('learnSkillsList').innerHTML = learnList.length === 0 
+        ? `<p class="text-xs text-slate-400 italic py-2">No learning targets added yet.</p>`
+        : learnList.map(s => `
+          <div class="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between hover:border-indigo-300 transition-colors">
+            <div>
+              <div class="text-xs font-bold text-slate-900">${escapeHtml(s.name)}</div>
+              <div class="text-[11px] text-slate-500">${escapeHtml(s.notes || 'Target skill')}</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-[10px] font-bold">${escapeHtml(s.level)}</span>
+              <button onclick="deleteSkill(${s.id})" title="Remove Skill" class="text-slate-400 hover:text-rose-600 text-xs font-bold px-1">✕</button>
+            </div>
+          </div>
+        `).join('');
+    }
+
+    function renderRecommendedMatches() {
+      const container = document.getElementById('recommendedMatchesContainer');
+      const teachSet = new Set(appState.skills.filter(s => s.type === 'TEACH').map(s => s.name.toLowerCase()));
+      const learnSet = new Set(appState.skills.filter(s => s.type === 'LEARN').map(s => s.name.toLowerCase()));
+
+      const peers = appState.availablePeers;
+      container.innerHTML = peers.map(p => {
+        let compatibility = 75;
+        if (learnSet.has(p.teaches.toLowerCase())) compatibility = 95;
+        if (teachSet.has(p.wants.toLowerCase())) compatibility = Math.min(100, compatibility + 15);
+
+        return `
+          <div class="p-4 rounded-2xl border border-slate-200/90 hover:border-brand-400 bg-white shadow-xs space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-display font-bold text-xs text-slate-900">${escapeHtml(p.name)}</h3>
+                <span class="text-[11px] text-slate-400">${escapeHtml(p.dept)}</span>
+              </div>
+              <span class="text-xs font-bold text-brand-600 font-mono">${compatibility}% Match</span>
+            </div>
+            <div class="text-xs text-slate-600 bg-slate-50 p-2 rounded-xl space-y-0.5">
+              <div><strong class="text-brand-700">Teaches:</strong> ${escapeHtml(p.teaches)}</div>
+              <div><strong class="text-slate-700">Wants:</strong> ${escapeHtml(p.wants)}</div>
+            </div>
+            <button onclick="proposeSwap('${escapeHtml(p.name)}', '${escapeHtml(p.teaches)}')" class="w-full py-2 rounded-xl bg-brand-50 hover:bg-brand-500 text-brand-700 hover:text-white font-semibold text-xs border border-brand-200 hover:border-brand-500 transition-all text-center cursor-pointer">
+              Send Swap Proposal
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderLeaderboard() {
+      const container = document.getElementById('leaderboardList');
+      const u = appState.user;
+      
+      const topList = [
+        { rank: 1, name: u.points > 100 ? u.name : "Rohan Sethi", points: Math.max(u.points, 140), dept: "Computer Science" },
+        { rank: 2, name: u.points > 100 ? "Rohan Sethi" : (u.points > 0 ? u.name : "Meera Nambiar"), points: Math.max(u.points, 90), dept: "Information Science" },
+        { rank: 3, name: u.points === 0 ? u.name : "Tanmay Das", points: u.points, dept: u.dept }
+      ];
+
+      container.innerHTML = topList.map(item => `
+        <div class="flex items-center justify-between p-2.5 rounded-xl ${item.name === u.name ? 'bg-brand-50 border border-brand-300' : 'bg-slate-50 border border-slate-100'}">
+          <div class="flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded-full ${item.rank === 1 ? 'bg-amber-400 text-slate-950 font-bold' : 'bg-slate-200 text-slate-700'} text-[11px] flex items-center justify-center">
+              #${item.rank}
+            </span>
+            <div>
+              <div class="text-xs font-bold text-slate-900">${escapeHtml(item.name)} ${item.name === u.name ? '<span class="text-[10px] text-brand-600 font-semibold">(You)</span>' : ''}</div>
+              <div class="text-[10px] text-slate-500">${escapeHtml(item.dept)}</div>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-amber-600 font-mono">${item.points} pts</span>
+        </div>
+      `).join('');
+    }
+
+    function renderNotifications() {
+      const list = document.getElementById('notifList');
+      const badge = document.getElementById('notifBadge');
+      if (appState.notifications.length === 0) {
+        badge.classList.add('hidden');
+        list.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center italic">No new notifications</p>`;
+        return;
+      }
+      badge.classList.remove('hidden');
+      list.innerHTML = appState.notifications.map(n => `
+        <div class="py-2.5 px-2 hover:bg-slate-50 rounded-xl transition-colors text-xs space-y-0.5">
+          <p class="font-semibold text-slate-800">${escapeHtml(n.title)}</p>
+          <p class="text-slate-500 text-[11px]">${escapeHtml(n.body)}</p>
+          <span class="text-[10px] text-slate-400 font-mono">${n.time}</span>
+        </div>
+      `).join('');
+    }
+
+    // -------------------------------------------------------------
+    // Interactive Handlers
+    // -------------------------------------------------------------
+    function handleSkillSubmit(e) {
+      e.preventDefault();
+      const title = document.getElementById('skillTitle').value.trim();
+      const type = document.getElementById('skillCategoryType').value;
+      const level = document.getElementById('skillLevel').value;
+      const notes = document.getElementById('skillNotes').value.trim();
+
+      if (!title) {
+        showToast("Please provide a valid skill name", "error");
+        return;
+      }
+
+      const newSkill = {
+        id: Date.now(),
+        name: title,
+        type: type,
+        level: level,
+        notes: notes || (type === 'TEACH' ? 'Offered mentoring' : 'Learning target')
+      };
+
+      appState.skills.push(newSkill);
+      closeModal('teachModal');
+      e.target.reset();
+      showToast(`Added '${title}' (${level}) to your skill portfolio!`, 'success');
+      saveState();
+    }
+
+    function deleteSkill(id) {
+      appState.skills = appState.skills.filter(s => s.id !== id);
+      showToast('Skill removed from portfolio', 'info');
+      saveState();
+    }
+
+    function acceptProposal(id) {
+      const req = appState.requests.find(r => r.id === id);
+      if (!req) return;
+
+      req.status = 'ACCEPTED';
+      appState.sessions.push({
+        id: Date.now(),
+        partner: req.sender,
+        role: "Teaching",
+        skill: req.skill,
+        time: "Tomorrow, 4:00 PM (Study Pod)",
+        status: "CONFIRMED"
+      });
+
+      appState.user.points += 20;
+      appState.notifications.unshift({
+        title: "Session Confirmed",
+        body: `You accepted exchange with ${req.sender} for ${req.skill}.`,
+        time: "Just now"
+      });
+
+      showToast(`Accepted proposal from ${req.sender}! Added to Upcoming Sessions (+20 pts).`, 'success');
+      saveState();
+    }
+
+    function declineProposal(id) {
+      const req = appState.requests.find(r => r.id === id);
+      if (req) req.status = 'REJECTED';
+      showToast('Proposal politely declined.', 'info');
+      saveState();
+    }
+
+    function withdrawProposal(id) {
+      appState.requests = appState.requests.filter(r => r.id !== id);
+      showToast('Exchange proposal withdrawn.', 'info');
+      saveState();
+    }
+
+    function proposeSwap(peerName, skillName) {
+      const newReq = {
+        id: Date.now(),
+        type: "OUTGOING",
+        sender: appState.user.name,
+        receiver: peerName,
+        skill: skillName,
+        message: `Hi ${peerName}, I would love to learn ${skillName} through SkillSwap!`,
+        status: "PENDING",
+        createdAt: "Just now"
+      };
+
+      appState.requests.push(newReq);
+      showToast(`Exchange proposal sent to ${peerName} for '${skillName}'!`, 'success');
+      saveState();
+    }
+
+    function markSessionCompleted(sessionId) {
+      const sess = appState.sessions.find(s => s.id === sessionId);
+      if (!sess) return;
+      sess.status = 'COMPLETED';
+      appState.user.points += 30;
+      appState.user.ratingCount += 1;
+      showToast(`Session marked completed! +30 reputation points awarded.`, 'success');
+      saveState();
+    }
+
+    function setSessionFilter(filter) {
+      currentSessionFilter = filter;
+      document.getElementById('tabAll').className = filter === 'ALL' ? 'px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs' : 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900';
+      document.getElementById('tabTeaching').className = filter === 'TEACHING' ? 'px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs' : 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900';
+      document.getElementById('tabLearning').className = filter === 'LEARNING' ? 'px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-xs' : 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900';
+      renderSessions();
+    }
+
+    function handleProfileUpdate(e) {
+      e.preventDefault();
+      const name = document.getElementById('inputProfileName').value.trim();
+      const usn = document.getElementById('inputProfileUSN').value.trim();
+      const dept = document.getElementById('inputProfileDept').value.trim();
+      const bio = document.getElementById('inputProfileBio').value.trim();
+
+      if (!name || !usn) {
+        showToast('Name and USN are required', 'error');
+        return;
+      }
+
+      appState.user.name = name;
+      appState.user.usn = usn;
+      if (dept) appState.user.dept = dept;
+      if (bio) appState.user.bio = bio;
+
+      closeModal('switchStudentModal');
+      showToast('Student profile updated successfully!', 'success');
+      saveState();
+    }
+
+    function openPodModal() {
+      const token = `#CAMPUS-${appState.user.usn}-${Date.now().toString(36).toUpperCase()}`;
+      document.getElementById('qrTokenDisplay').innerText = token;
+      openModal('qrModal');
+    }
+
+    function copyPodToken() {
+      const token = document.getElementById('qrTokenDisplay').innerText;
+      navigator.clipboard.writeText(token).then(() => {
+        showToast('Study Pod Token copied to clipboard!', 'success');
+        closeModal('qrModal');
+      });
+    }
+
+    function clearNotifications() {
+      appState.notifications = [];
+      saveState();
+      showToast('All notifications cleared', 'info');
+    }
+
+    function handleSearch(query) {
+      const dd = document.getElementById('searchDropdown');
+      const list = document.getElementById('searchResultsList');
+      if (!query || query.trim().length === 0) {
+        dd.classList.add('hidden');
+        return;
+      }
+
+      const q = query.trim().toLowerCase();
+      const matchedSkills = appState.skills.filter(s => s.name.toLowerCase().includes(q));
+      const matchedPeers = appState.availablePeers.filter(p => p.name.toLowerCase().includes(q) || p.teaches.toLowerCase().includes(q));
+
+      if (matchedSkills.length === 0 && matchedPeers.length === 0) {
+        list.innerHTML = `<p class="text-xs text-slate-400 p-2 italic">No matches found for '${escapeHtml(query)}'</p>`;
+      } else {
+        list.innerHTML = `
+          ${matchedSkills.map(s => `
+            <div class="p-2 rounded-xl hover:bg-slate-50 flex items-center justify-between text-xs cursor-pointer" onclick="scrollToSection('requestsSection'); handleSearch('');">
+              <span><strong>Skill:</strong> ${escapeHtml(s.name)} (${s.type})</span>
+              <span class="text-brand-600 font-bold">In Portfolio</span>
+            </div>
+          `).join('')}
+          ${matchedPeers.map(p => `
+            <div class="p-2 rounded-xl hover:bg-slate-50 flex items-center justify-between text-xs cursor-pointer" onclick="proposeSwap('${escapeHtml(p.name)}', '${escapeHtml(p.teaches)}'); handleSearch('');">
+              <span><strong>Peer:</strong> ${escapeHtml(p.name)} teaches ${escapeHtml(p.teaches)}</span>
+              <span class="text-brand-600 font-semibold underline">Propose Swap</span>
+            </div>
+          `).join('')}
+        `;
+      }
+      dd.classList.remove('hidden');
+    }
+
+    // Modal Helpers
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('hidden');
+      if (id === 'switchStudentModal') {
+        document.getElementById('inputProfileName').value = appState.user.name;
+        document.getElementById('inputProfileUSN').value = appState.user.usn;
+        document.getElementById('inputProfileDept').value = appState.user.dept;
+        document.getElementById('inputProfileBio').value = appState.user.bio || '';
+      }
+    }
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
+    }
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('sidebarOverlay').classList.toggle('hidden');
+    }
+    function toggleDropdown(id) {
+      document.getElementById(id).classList.toggle('hidden');
+    }
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const bgColor = type === 'error' ? 'bg-rose-950 border-rose-600 text-rose-100' : 'bg-slate-900 border-brand-500 text-white';
+      toast.className = `flex items-center gap-2 px-4 py-3 rounded-2xl ${bgColor} border text-xs shadow-2xl pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-300`;
+      toast.innerHTML = `<span class="material-symbols-outlined text-[18px] text-brand-400">info</span><span>${escapeHtml(message)}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAll();
+    });
+  </script>
+</body>
+</html>

@@ -4,155 +4,294 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 <h:head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>SkillSwap - Reverse Skill Matching</title>
-    <h:outputStylesheet name="css/style.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 300: '#5eead4',
+                            400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e',
+                        },
+                        navy: {
+                            800: '#162d50', 850: '#11223f', 900: '#0b192c', 950: '#060d17',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
 </h:head>
 
-<h:body>
-    <header class="navbar">
-        <a href="dashboard.xhtml" class="brand">🤝 SkillSwap</a>
-        <ul class="nav-links">
-            <li><a href="dashboard.xhtml">Dashboard</a></li>
-            <li><a href="skills.xhtml">My Skills</a></li>
-            <li><a href="search.xhtml">Search Mentors</a></li>
-            <li><a href="reverse_match.xhtml" class="active">Reverse Match</a></li>
-            <li><a href="profile.xhtml">Profile</a></li>
-            <li>
-                <h:form style="display:inline; margin:0;">
-                    <h:commandLink action="#{userBean.logout}" value="Logout"
-                                   style="color:#fca5a5; font-weight:600; text-decoration:none; padding:0.4rem 0.8rem;" />
-                </h:form>
-            </li>
-        </ul>
-    </header>
+<h:body class="bg-[#F8FAFC] font-sans text-slate-800 antialiased min-h-screen">
 
-    <div class="container">
-        <!-- Header -->
-        <div class="header-card">
-            <span class="badge badge-learn" style="margin-bottom: 0.4rem;">Module 2: Reverse Matching Engine</span>
-            <h1>Reverse Skill Match</h1>
-            <p>
-                Instead of searching manually, our Reverse Match Engine automatically finds 
-                students who want to learn what <strong>you teach</strong>!
-            </p>
-        </div>
-
-        <!-- Global Messages -->
-        <h:messages globalOnly="true" styleClass="ui-messages"
-                    infoClass="ui-messages-info" errorClass="ui-messages-error" />
-
-        <!-- Person 3 Integration Confirmation Banner -->
-        <h:panelGroup rendered="#{searchBean.requestSentSuccess}">
-            <div style="background: #eff6ff; border: 1.5px solid #3b82f6; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <span style="font-size: 1.8rem;">🚀</span>
-                    <div>
-                        <strong style="color: #1e40af; font-size: 1.05rem;">Integration Hand-off to Person 3 Module</strong>
-                        <p style="color: #1e3a8a; font-size: 0.95rem; margin-top: 0.2rem;">
-                            Skill Exchange Request for <strong>'#{searchBean.lastRequestedSkill}'</strong> with student 
-                            <strong>#{searchBean.lastRequestedStudent}</strong> has been created! 
-                            Person 3 will process this request and handle the accept/reject and session workflow.
-                        </p>
-                    </div>
+    <!-- Guest View -->
+    <h:panelGroup rendered="#{!userBean.loggedIn}">
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="max-w-md w-full bg-white rounded-3xl p-8 text-center shadow-xl border border-slate-200 space-y-4">
+                <div class="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto text-2xl">
+                    🔒
                 </div>
-            </div>
-        </h:panelGroup>
-
-        <!-- Current Teaching Skills Banner -->
-        <div class="card" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                <div>
-                    <h3 style="color: #166534; margin-bottom: 0.25rem;">Skills You Currently Offer to Teach:</h3>
-                    <div style="margin-top: 0.4rem;">
-                        <ui:repeat value="#{skillBean.getSkillsOffered(userBean.currentUser.id)}" var="s">
-                            <span class="badge badge-teach" style="margin-right: 0.4rem;">
-                                #{s.skillName} (#{s.proficiencyLevel})
-                            </span>
-                        </ui:repeat>
-                        <h:panelGroup rendered="#{empty skillBean.getSkillsOffered(userBean.currentUser.id)}">
-                            <span style="color: #64748b; font-size: 0.9rem;">You haven't listed any teaching skills yet.</span>
-                        </h:panelGroup>
-                    </div>
-                </div>
-                <div>
-                    <h:link outcome="skills" value="+ Add More Skills to Teach" styleClass="btn btn-outline btn-sm" />
+                <h2 class="font-display font-bold text-2xl text-slate-900">Sign in Required</h2>
+                <p class="text-sm text-slate-500">Please log in to discover reverse skill matches.</p>
+                <div class="pt-2">
+                    <h:link outcome="login" value="Go to Login" styleClass="inline-block w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm transition-all" />
                 </div>
             </div>
         </div>
+    </h:panelGroup>
 
-        <!-- Reverse Matches List -->
-        <h3 style="margin: 1.5rem 0 1rem 0;">
-            Students Looking for Your Skills
-            <span style="font-size: 0.95rem; font-weight: normal; color: #64748b;">
-                (Ranked by Mutual Compatibility %)
-            </span>
-        </h3>
+    <!-- Authenticated View -->
+    <h:panelGroup rendered="#{userBean.loggedIn}">
 
-        <h:form id="reverseForm">
-            <ui:repeat value="#{searchBean.fetchReverseMatches(userBean.currentUser.id)}" var="match">
-                <div class="match-card">
-                    <!-- Student details -->
-                    <div class="match-info" style="flex: 1;">
-                        <h3>
-                            #{match.student.name}
-                            <span class="badge #{match.matchType eq 'Mutual Skill Swap' ? 'badge-teach' : 'badge-intermediate'}">
-                                #{match.matchType}
-                            </span>
-                            <span style="font-size: 0.9rem; color: #16a34a; font-weight: 600;">
-                                ⭐ #{match.student.reputationScore}
-                            </span>
-                        </h3>
-                        <p>
-                            <strong>USN:</strong> #{match.student.usn} • 
-                            <strong>Department:</strong> #{match.student.department}
-                        </p>
-                        <p style="margin-top: 0.4rem; color: #334155;">
-                            <strong>Wants to Learn from You:</strong> 
-                            <span style="color: #d97706; font-weight: 600;">#{match.matchedSkill}</span>
-                        </p>
-                        <p style="color: #64748b; font-size: 0.85rem;">
-                            <strong>Skills They Can Teach:</strong> #{match.offeredSummary}
-                        </p>
-                        <div style="margin-top: 0.5rem; font-size: 0.85rem; color: #166534; font-weight: 600; background: #ecfdf5; padding: 0.4rem 0.6rem; border-radius: 6px; display: inline-block;">
-                            ✨ #{match.compatibilityReason}
-                        </div>
-                    </div>
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-72 bg-gradient-to-b from-[#0B192C] via-[#0F223D] to-[#081220] z-50 flex flex-col justify-between text-white border-r border-slate-800/80 transition-transform duration-300 -translate-x-full lg:translate-x-0 shadow-2xl">
+            <div class="flex flex-col flex-1 overflow-y-auto">
+                <div class="h-20 px-6 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/40">
+                    <a href="dashboard.xhtml" class="flex items-center gap-3">
+                        <img src="images/logo.png" alt="SkillSwap Campus Exchange" class="h-9 w-auto object-contain" />
+                    </a>
+                </div>
 
-                    <!-- Compatibility Box -->
-                    <div class="match-score-box" style="#{match.compatibilityPercentage eq 100 ? 'background: #dcfce7; border-color: #86efac;' : ''}">
-                        <div class="score-number" style="#{match.compatibilityPercentage eq 100 ? 'color: #15803d;' : 'color: #2563eb;'}">
-                            #{match.compatibilityPercentage}%
-                        </div>
-                        <div class="score-label">Compatibility</div>
-                    </div>
-
-                    <!-- Exchange Request Button (Person 3 Integration) -->
+                <div class="px-3 py-4 space-y-6">
                     <div>
-                        <h:commandButton value="Request Skill Exchange"
-                                         action="#{searchBean.requestSkillExchange(match)}"
-                                         styleClass="btn btn-success"
-                                         style="padding: 0.75rem 1.25rem; white-space: nowrap;" />
+                        <p class="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Platform Navigation</p>
+                        <nav class="space-y-1">
+                            <a href="dashboard.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">grid_view</span>
+                                    <span>Dashboard</span>
+                                </div>
+                            </a>
+                            <a href="skills.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">swap_horiz</span>
+                                    <span>My Skills</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 text-xs font-mono">#{skillBean.getSkillsOffered(userBean.currentUser.id).size()}</span>
+                            </a>
+                            <a href="search.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">search</span>
+                                    <span>Search Mentors</span>
+                                </div>
+                            </a>
+                            <a href="reverse_match.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-brand-500/20 to-teal-500/5 text-brand-300 border border-brand-500/30 font-semibold text-sm">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-brand-400 text-[20px]">auto_awesome</span>
+                                    <span>Reverse Match</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 text-xs font-mono font-bold">#{searchBean.fetchReverseMatches(userBean.currentUser.id).size()}</span>
+                            </a>
+                            <a href="reputation.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">verified_user</span>
+                                    <span>Reputation &amp; Ratings</span>
+                                </div>
+                            </a>
+                            <a href="leaderboard.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">trophy</span>
+                                    <span>Leaderboard</span>
+                                </div>
+                                <span class="text-amber-400 text-xs font-mono font-semibold">##{leaderboardBean.getUserRank(userBean.currentUser.id)}</span>
+                            </a>
+                            <a href="profile.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">person</span>
+                                    <span>My Profile</span>
+                                </div>
+                            </a>
+                        </nav>
                     </div>
                 </div>
-            </ui:repeat>
+            </div>
 
-            <h:panelGroup rendered="#{empty searchBean.fetchReverseMatches(userBean.currentUser.id)}">
-                <div class="card" style="text-align: center; padding: 3rem; color: #64748b;">
-                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🤝</div>
-                    <h3>No reverse matches found yet</h3>
-                    <p style="max-width: 500px; margin: 0 auto 1.5rem auto;">
-                        Make sure you have added skills you can teach in the <strong>My Skills</strong> tab. 
-                        Once you list your skills, students wanting to learn them will appear here automatically!
+            <!-- Profile Footer -->
+            <div class="p-4 bg-slate-950/60 border-t border-slate-800/80 space-y-2">
+                <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900/60 border border-slate-800">
+                    <a href="profile.xhtml" class="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-85 transition-opacity" title="View My Profile">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                            #{userBean.currentUser.initials}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-semibold text-white truncate">#{userBean.currentUser.name}</p>
+                            <p class="text-[10px] text-brand-300 font-mono truncate">#{userBean.currentUser.usn}</p>
+                        </div>
+                    </a>
+                    <h:form style="display:inline; margin:0;">
+                        <h:commandLink action="#{userBean.logout}" title="Sign Out" styleClass="text-slate-400 hover:text-rose-400 p-1 rounded transition-colors flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[18px]">logout</span>
+                        </h:commandLink>
+                    </h:form>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="lg:pl-72 flex flex-col min-h-screen">
+
+            <!-- Top Header -->
+            <header class="sticky top-0 z-30 h-16 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <h2 class="font-display font-bold text-slate-800 text-base">Campus Peer Learning Exchange</h2>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-600 font-medium">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Campus Node Active</span>
+                    </div>
+
+                    <a href="profile.xhtml" class="flex items-center gap-2 hover:opacity-85 transition-opacity" title="View My Profile">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-navy-800 to-brand-600 flex items-center justify-center text-white font-bold text-xs">
+                            #{userBean.currentUser.initials}
+                        </div>
+                        <div class="hidden sm:block text-left">
+                            <p class="text-xs font-bold text-slate-900 leading-tight">#{userBean.currentUser.name}</p>
+                            <p class="text-[11px] text-slate-500 font-mono">#{userBean.currentUser.usn}</p>
+                        </div>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+
+                <!-- Header Banner -->
+                <div class="bg-gradient-to-r from-[#0B192C] to-[#112746] rounded-3xl p-6 sm:p-8 text-white shadow-lg border border-slate-800">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="px-3 py-1 rounded-full bg-brand-500/20 text-brand-300 text-xs font-semibold uppercase tracking-wider border border-brand-500/30">AI Reverse Match</span>
+                    </div>
+                    <h1 class="font-display font-extrabold text-2xl sm:text-3xl text-white">Reverse Skill Match Engine</h1>
+                    <p class="text-slate-300 text-sm mt-1">
+                        Instead of searching manually, our Reverse Match Engine automatically finds 
+                        students who want to learn what <strong>you teach</strong>!
                     </p>
-                    <h:link outcome="skills" value="Go to My Skills" styleClass="btn btn-primary" />
                 </div>
-            </h:panelGroup>
-        </h:form>
-    </div>
 
-    <footer>
-        SkillSwap Project • Module 2: Skill Search &amp; Reverse Match • NNM24CS126
-    </footer>
+                <!-- Global Notifications -->
+                <h:messages globalOnly="true" styleClass="p-4 rounded-2xl bg-teal-50 border border-teal-200 text-teal-900 text-xs font-medium space-y-1"
+                            infoClass="text-teal-800 font-semibold" errorClass="text-rose-700 font-semibold" />
+
+                <!-- Success Banner for Exchange Request -->
+                <h:panelGroup rendered="#{searchBean.requestSentSuccess}">
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex items-start gap-4 text-emerald-900 shadow-sm">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-[24px]">task_alt</span>
+                        </div>
+                        <div>
+                            <strong class="font-bold text-emerald-900 text-sm block">Request Sent Successfully!</strong>
+                            <p class="text-xs text-emerald-800 mt-0.5">
+                                Skill Exchange Request for <strong>'#{searchBean.lastRequestedSkill}'</strong> with student 
+                                <strong>#{searchBean.lastRequestedStudent}</strong> has been created!
+                            </p>
+                        </div>
+                    </div>
+                </h:panelGroup>
+
+                <!-- How Reverse Matching Works Card -->
+                <div class="bg-white rounded-3xl p-6 border-l-4 border-l-brand-500 border border-slate-200 shadow-sm space-y-2">
+                    <div class="flex items-center gap-2 text-slate-900 font-display font-bold text-base">
+                        <span class="material-symbols-outlined text-brand-600">tips_and_updates</span>
+                        <span>How Reverse Matching Works</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        We inspect your <strong>Offered Skills</strong> and cross-reference them against skills other students 
+                        actively <strong>Want to Learn</strong>. A <strong>100% Match</strong> occurs when you and another student 
+                        can teach each other complementary skills!
+                    </p>
+                </div>
+
+                <!-- Results Section -->
+                <div class="space-y-4">
+                    <h2 class="font-display font-bold text-slate-900 text-lg">Students Seeking What You Teach</h2>
+
+                    <h:form id="reverseResultsForm" styleClass="space-y-4">
+                        <ui:repeat value="#{searchBean.fetchReverseMatches(userBean.currentUser.id)}" var="match">
+                            <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                <div class="space-y-2 flex-1">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+                                            #{match.student.initials}
+                                        </div>
+                                        <div>
+                                            <h3 class="font-display font-bold text-slate-900 text-base">#{match.student.name}</h3>
+                                            <p class="text-xs text-slate-500 font-mono">#{match.student.usn} • #{match.student.department}</p>
+                                        </div>
+                                        <div class="ml-auto md:ml-2">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 text-xs font-semibold">
+                                                ⭐ #{match.student.reputationScore > 0 ? match.student.reputationScore : 'New Mentor'}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="pt-2 space-y-1 text-xs">
+                                        <p class="text-slate-700">
+                                            <strong class="font-semibold text-slate-900">Wants to Learn:</strong>
+                                            <span class="px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 font-bold ml-1">#{match.matchedSkill}</span>
+                                        </p>
+                                        <p class="text-slate-600">
+                                            <strong class="font-semibold text-slate-800">Can Teach You:</strong> #{match.offeredSummary}
+                                        </p>
+                                        <p class="text-slate-500">
+                                            <strong class="font-semibold text-slate-700">Other Skills They Want:</strong> #{match.wantedSummary}
+                                        </p>
+                                        <div class="pt-1 text-emerald-600 font-semibold">
+                                            ✨ #{match.compatibilityReason}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-4 shrink-0 border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6 justify-between md:justify-end">
+                                    <div class="text-center px-2">
+                                        <div class="font-display font-extrabold text-2xl #{match.compatibilityPercentage eq 100 ? 'text-emerald-600' : 'text-brand-600'}">
+                                            #{match.compatibilityPercentage}%
+                                        </div>
+                                        <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Reverse Match</div>
+                                    </div>
+                                    <h:commandButton value="Initiate Exchange"
+                                                     action="#{searchBean.requestSkillExchange(match, userBean.currentUser.id)}"
+                                                     styleClass="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs transition-all shadow-sm cursor-pointer whitespace-nowrap" />
+                                </div>
+                            </div>
+                        </ui:repeat>
+
+                        <h:panelGroup rendered="#{empty searchBean.fetchReverseMatches(userBean.currentUser.id)}">
+                            <div class="bg-white rounded-3xl p-12 text-center border border-slate-200 text-slate-500 space-y-3">
+                                <span class="material-symbols-outlined text-4xl text-slate-300">handshake</span>
+                                <h3 class="font-display font-bold text-slate-800 text-base">No reverse matches found yet</h3>
+                                <p class="text-xs text-slate-500 max-w-md mx-auto">
+                                    Make sure you have added skills you can teach in the <strong>My Skills</strong> tab. 
+                                    Once you list your skills, students wanting to learn them will appear here automatically!
+                                </p>
+                                <div class="pt-2">
+                                    <h:link outcome="skills" value="Go to My Skills" styleClass="inline-block px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs shadow-sm transition-all" />
+                                </div>
+                            </div>
+                        </h:panelGroup>
+                    </h:form>
+                </div>
+
+            </main>
+        </div>
+    </h:panelGroup>
+
 </h:body>
 </html>

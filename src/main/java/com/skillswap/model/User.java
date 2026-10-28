@@ -13,6 +13,9 @@ public class User implements Serializable {
     private String department;
     private String bio;
     private double reputationScore = 4.5;
+    private String role = "STUDENT";
+    private boolean active = true;
+    private String createdAt;
 
     public User() {}
 
@@ -25,6 +28,8 @@ public class User implements Serializable {
         this.department = department;
         this.bio = bio;
         this.reputationScore = reputationScore;
+        this.role = "STUDENT";
+        this.active = true;
     }
 
     public int getId() {
@@ -89,5 +94,50 @@ public class User implements Serializable {
 
     public void setReputationScore(double reputationScore) {
         this.reputationScore = reputationScore;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public boolean isAdmin() {
+        return "ADMIN".equalsIgnoreCase(role);
+    }
+
+    public String getInitials() {
+        if (name == null || name.isEmpty()) return "?";
+        String[] parts = name.trim().split("\\s+");
+        if (parts.length >= 2) {
+            return ("" + parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+        }
+        return ("" + parts[0].charAt(0)).toUpperCase();
+    }
+
+    public String getReputationTier() {
+        if (reputationScore >= 4.8) return "Campus Mentor (Level 4)";
+        if (reputationScore >= 4.0) return "Senior Peer Tutor (Level 3)";
+        if (reputationScore >= 3.0) return "Verified Peer Tutor (Level 2)";
+        if (reputationScore > 0.0) return "Junior Mentor (Level 1)";
+        return "New Mentor";
     }
 }

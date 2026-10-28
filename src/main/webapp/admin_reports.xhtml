@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>SkillSwap - Reports Management</title>
+    <h:outputStylesheet library="css" name="style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</h:head>
+
+<h:body>
+    <!-- Admin Access Check -->
+    <h:panelGroup rendered="#{!userBean.admin}">
+        <div class="container" style="max-width: 500px; margin-top: 4rem; text-align: center;">
+            <div class="card" style="padding: 3rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔒</div>
+                <h2 style="color: var(--danger); margin-bottom: 0.75rem;">Access Denied</h2>
+                <a href="login.xhtml?logout=true" class="btn btn-primary">Sign in with Admin Account</a>
+            </div>
+        </div>
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{userBean.admin}">
+        <!-- Admin Navbar -->
+        <header class="navbar">
+            <a href="admin_dashboard.xhtml" class="brand" style="display: flex; align-items: center; gap: 0.5rem;">
+                <img src="images/logo.png" alt="SkillSwap Admin" style="height: 28px; width: auto;" />
+                <span style="font-size: 0.85rem; background: rgba(20, 184, 166, 0.2); color: #2dd4bf; padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 700; border: 1px solid rgba(20, 184, 166, 0.4);">ADMIN</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="admin_dashboard.xhtml">Dashboard</a></li>
+                <li><a href="admin_users.xhtml">Users</a></li>
+                <li><a href="admin_reports.xhtml" class="active">Reports</a></li>
+                <li><a href="leaderboard.xhtml">Leaderboard</a></li>
+                <li>
+                    <h:form style="display:inline; margin:0;">
+                        <h:commandLink action="#{userBean.logout}" value="Logout"
+                                       style="color:#fca5a5; font-weight:600; text-decoration:none; padding:0.4rem 0.8rem;" />
+                    </h:form>
+                </li>
+            </ul>
+        </header>
+
+        <div class="admin-layout">
+            <!-- Sidebar -->
+            <aside class="admin-sidebar">
+                <div class="sidebar-header">
+                    <h3>📊 Admin Panel</h3>
+                    <p>Welcome, #{userBean.currentUser.name}</p>
+                </div>
+                <ul class="sidebar-nav">
+                    <li><a href="admin_dashboard.xhtml"><span class="nav-icon">📊</span> Dashboard</a></li>
+                    <li><a href="admin_users.xhtml"><span class="nav-icon">👥</span> User Management</a></li>
+                    <li><a href="admin_reports.xhtml" class="active"><span class="nav-icon">📋</span> Reports</a></li>
+                    <li><a href="leaderboard.xhtml"><span class="nav-icon">🏆</span> Leaderboard</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="admin-content">
+                <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">Reports Management</h1>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Review and manage student-submitted reports</p>
+
+                <h:messages globalOnly="true" styleClass="ui-messages"
+                            infoClass="ui-messages-info" errorClass="ui-messages-error" />
+
+                <!-- Summary Cards -->
+                <div class="grid-4" style="margin-bottom: 1.5rem;">
+                    <div class="admin-stat-card">
+                        <div class="stat-icon icon-blue">📋</div>
+                        <div class="stat-info">
+                            <div class="stat-value">#{adminBean.totalReports}</div>
+                            <div class="stat-label">Total Reports</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="stat-icon icon-amber">⏳</div>
+                        <div class="stat-info">
+                            <div class="stat-value">#{adminBean.pendingReports}</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h:form id="reportsForm">
+                    <!-- Search and Filter -->
+                    <div class="search-bar">
+                        <h:inputText value="#{adminBean.reportSearchQuery}" styleClass="form-control"
+                                     style="flex: 1; max-width: 400px;" />
+                        <h:selectOneMenu value="#{adminBean.reportStatusFilter}" styleClass="form-control"
+                                         style="max-width: 180px;">
+                            <f:selectItem itemValue="ALL" itemLabel="All Status" />
+                            <f:selectItem itemValue="PENDING" itemLabel="Pending" />
+                            <f:selectItem itemValue="UNDER_REVIEW" itemLabel="Under Review" />
+                            <f:selectItem itemValue="RESOLVED" itemLabel="Resolved" />
+                            <f:selectItem itemValue="REJECTED" itemLabel="Rejected" />
+                        </h:selectOneMenu>
+                        <h:commandButton value="🔍 Search" styleClass="btn btn-primary" />
+                    </div>
+
+                    <!-- Reports List -->
+                    <ui:repeat value="#{adminBean.filteredReports}" var="report">
+                        <div class="card" style="margin-bottom: 1rem;">
+                            <div class="flex-between" style="margin-bottom: 0.75rem;">
+                                <div>
+                                    <h3 style="font-size: 1.05rem;">
+                                        Report ##{report.id}
+                                        <span class="badge #{report.status eq 'PENDING' ? 'badge-pending' : report.status eq 'UNDER_REVIEW' ? 'badge-intermediate' : report.status eq 'RESOLVED' ? 'badge-completed' : 'badge-rejected'}"
+                                              style="margin-left: 0.5rem;">
+                                            #{report.statusLabel}
+                                        </span>
+                                    </h3>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">
+                                        Submitted: #{report.createdAt}
+                                    </p>
+                                </div>
+                                <div>
+                                    <span class="badge badge-teach">#{report.reason}</span>
+                                </div>
+                            </div>
+
+                            <div class="grid-2" style="margin-top: 0; gap: 1rem;">
+                                <div>
+                                    <p style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Reporting Student</p>
+                                    <p style="font-weight: 600;">#{report.reporterName}</p>
+                                </div>
+                                <div>
+                                    <p style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Reported Student</p>
+                                    <p style="font-weight: 600; color: var(--danger);">#{report.reportedName}</p>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 0.75rem;">
+                                <p style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Description</p>
+                                <p style="font-size: 0.92rem; color: var(--text-secondary); background: var(--bg); padding: 0.65rem; border-radius: var(--radius); margin-top: 0.25rem;">
+                                    #{report.description}
+                                </p>
+                            </div>
+
+                            <h:panelGroup rendered="#{report.adminNote != null and report.adminNote.length() > 0}">
+                                <div style="margin-top: 0.75rem;">
+                                    <p style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Admin Note</p>
+                                    <p style="font-size: 0.92rem; color: var(--primary); background: var(--primary-light); padding: 0.65rem; border-radius: var(--radius); margin-top: 0.25rem;">
+                                        #{report.adminNote}
+                                    </p>
+                                </div>
+                            </h:panelGroup>
+
+                            <!-- Admin Actions -->
+                            <h:panelGroup rendered="#{report.status ne 'RESOLVED' and report.status ne 'REJECTED'}">
+                                <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-light);">
+                                    <div class="form-group" style="margin-bottom: 0.5rem;">
+                                        <label style="font-size: 0.82rem;">Admin Note (optional)</label>
+                                        <h:inputText value="#{adminBean.adminNote}" styleClass="form-control"
+                                                     style="max-width: 500px;" />
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                        <h:panelGroup rendered="#{report.status eq 'PENDING'}">
+                                            <h:commandButton value="📝 Mark Under Review"
+                                                             action="#{adminBean.markReportUnderReview(report.id)}"
+                                                             styleClass="btn btn-primary btn-sm" />
+                                        </h:panelGroup>
+                                        <h:commandButton value="✅ Resolve"
+                                                         action="#{adminBean.resolveReport(report.id)}"
+                                                         styleClass="btn btn-success btn-sm" />
+                                        <h:commandButton value="✖ Reject"
+                                                         action="#{adminBean.rejectReport(report.id)}"
+                                                         styleClass="btn btn-danger btn-sm"
+                                                         onclick="return confirm('Are you sure you want to reject this report?');" />
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                    </ui:repeat>
+
+                    <h:panelGroup rendered="#{empty adminBean.filteredReports}">
+                        <div class="empty-state">
+                            <div class="empty-icon">📋</div>
+                            <h3>No reports found</h3>
+                            <p>No reports match your current search or filter criteria.</p>
+                        </div>
+                    </h:panelGroup>
+                </h:form>
+            </main>
+        </div>
+    </h:panelGroup>
+
+    <footer>
+        SkillSwap • Campus Peer-to-Peer Skill Learning &amp; Exchange Platform
+    </footer>
+</h:body>
+</html>

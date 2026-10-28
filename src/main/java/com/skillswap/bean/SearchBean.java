@@ -3,7 +3,6 @@ package com.skillswap.bean;
 import com.skillswap.dao.SkillDAO;
 import com.skillswap.model.MatchResult;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -23,24 +22,21 @@ public class SearchBean implements Serializable {
     private List<MatchResult> searchResults = new ArrayList<>();
     private List<MatchResult> reverseMatches = new ArrayList<>();
 
-    // Integration state with Person 3
+    private final com.skillswap.dao.ExchangeRequestDAO exchangeRequestDAO = new com.skillswap.dao.ExchangeRequestDAO();
+
     private String lastRequestedStudent;
     private String lastRequestedSkill;
     private boolean requestSentSuccess = false;
 
-    public SearchBean() {}
-
-    @PostConstruct
-    public void init() {
-        // Pre-initialize with common search
-        this.searchQuery = "Java";
+    public SearchBean() {
+        this.searchQuery = "";
     }
 
     public String search(int currentUserId) {
         this.searchResults = skillDAO.searchMentors(searchQuery, currentUserId);
         this.requestSentSuccess = false;
         if (searchResults.isEmpty()) {
-            addInfoMessage("No student mentors found matching '" + searchQuery + "'. Try searching for 'Python', 'Java', or 'Figma'.");
+            addInfoMessage("No student mentors found matching '" + (searchQuery.isEmpty() ? "all skills" : searchQuery) + "'. Try searching for another skill or list your skills first.");
         } else {
             addInfoMessage("Found " + searchResults.size() + " mentor(s) teaching skills matching '" + searchQuery + "'.");
         }
@@ -59,11 +55,16 @@ public class SearchBean implements Serializable {
         return reverseMatches;
     }
 
-    /**
-     * Integration Hook with Person 3:
-     * Triggers the request for a skill exchange, passing student and skill details.
-     */
-    public String requestSkillExchange(MatchResult match) {
+    public String quickSearch(String query, int currentUserId) {
+        this.searchQuery = query;
+        return search(currentUserId);
+    }
+
+    public String requestSkillExchange(MatchResult match, int senderId) {
+        if (senderId <= 0) {
+            addErrorMessage("Please log in to send a skill exchange proposal.");
+            return "login?faces-redirect=true";
+        }
         if (match == null || match.getStudent() == null) {
             addErrorMessage("Cannot initiate request: invalid student selection.");
             return null;
@@ -71,14 +72,29 @@ public class SearchBean implements Serializable {
 
         this.lastRequestedStudent = match.getStudent().getName();
         this.lastRequestedSkill = match.getMatchedSkill();
-        this.requestSentSuccess = true;
 
-        String msg = "Skill Exchange Request successfully submitted to " + lastRequestedStudent +
-                     " for '" + lastRequestedSkill + "' (Compatibility: " + match.getCompatibilityPercentage() + "%). " +
-                     "Ready for Person 3's Request & Session Management module!";
+        boolean ok = exchangeRequestDAO.createRequest(
+                senderId,
+                match.getStudent().getId(),
+                match.getMatchedSkill(),
+                "Hi " + lastRequestedStudent + ", I would like to learn " + match.getMatchedSkill() + " from you through SkillSwap!"
+        );
 
-        addInfoMessage(msg);
+        if (ok) {
+            this.requestSentSuccess = true;
+            String msg = "Skill Exchange Request successfully submitted to " + lastRequestedStudent +
+                         " for '" + lastRequestedSkill + "' (Compatibility: " + match.getCompatibilityPercentage() + "%). " +
+                         "The student has been notified!";
+            addInfoMessage(msg);
+        } else {
+            this.requestSentSuccess = false;
+            addErrorMessage("Could not send request: A pending request for '" + lastRequestedSkill + "' with " + lastRequestedStudent + " already exists, or request is invalid.");
+        }
         return null;
+    }
+
+    public String requestSkillExchange(MatchResult match) {
+        return requestSkillExchange(match, 0);
     }
 
     private void addInfoMessage(String msg) {

@@ -1,183 +1,355 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 <h:head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>SkillSwap - Manage Skills</title>
-    <h:outputStylesheet name="css/style.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 300: '#5eead4',
+                            400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e',
+                        },
+                        navy: {
+                            800: '#162d50', 850: '#11223f', 900: '#0b192c', 950: '#060d17',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
 </h:head>
 
-<h:body>
-    <header class="navbar">
-        <a href="dashboard.xhtml" class="brand">🤝 SkillSwap</a>
-        <ul class="nav-links">
-            <li><a href="dashboard.xhtml">Dashboard</a></li>
-            <li><a href="skills.xhtml" class="active">My Skills</a></li>
-            <li><a href="search.xhtml">Search Mentors</a></li>
-            <li><a href="reverse_match.xhtml">Reverse Match</a></li>
-            <li><a href="profile.xhtml">Profile</a></li>
-            <li>
-                <h:form style="display:inline; margin:0;">
-                    <h:commandLink action="#{userBean.logout}" value="Logout"
-                                   style="color:#fca5a5; font-weight:600; text-decoration:none; padding:0.4rem 0.8rem;" />
-                </h:form>
-            </li>
-        </ul>
-    </header>
+<h:body class="bg-[#F8FAFC] font-sans text-slate-800 antialiased min-h-screen">
 
-    <div class="container">
-        <div class="header-card">
-            <h1>Skill Portfolio Management</h1>
-            <p>Add and manage skills you can teach to peer students and skills you want to learn.</p>
-        </div>
-
-        <!-- Messages -->
-        <h:messages globalOnly="true" styleClass="ui-messages"
-                    infoClass="ui-messages-info" errorClass="ui-messages-error" />
-
-        <!-- Add Skill Form Card -->
-        <div class="card">
-            <h3>➕ Add a New Skill</h3>
-            <h:form id="addSkillForm">
-                <div class="grid-3" style="align-items: flex-end;">
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="skillName">Skill Name (e.g. Java, Python, SQL)</label>
-                        <h:inputText id="skillName" value="#{skillBean.newSkillName}"
-                                     styleClass="form-control" required="true"
-                                     requiredMessage="Please enter a skill name" />
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="skillType">Category</label>
-                        <h:selectOneMenu id="skillType" value="#{skillBean.newSkillType}" styleClass="form-control">
-                            <f:selectItem itemValue="TEACH" itemLabel="🎓 I can TEACH this (Offered)" />
-                            <f:selectItem itemValue="LEARN" itemLabel="🎯 I want to LEARN this (Wanted)" />
-                        </h:selectOneMenu>
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="proficiency">Proficiency</label>
-                        <h:selectOneMenu id="proficiency" value="#{skillBean.newProficiency}" styleClass="form-control">
-                            <f:selectItem itemValue="Beginner" itemLabel="Beginner" />
-                            <f:selectItem itemValue="Intermediate" itemLabel="Intermediate" />
-                            <f:selectItem itemValue="Expert" itemLabel="Expert" />
-                        </h:selectOneMenu>
-                    </div>
+    <!-- Guest / Not Logged In View -->
+    <h:panelGroup rendered="#{!userBean.loggedIn}">
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="max-w-md w-full bg-white rounded-3xl p-8 text-center shadow-xl border border-slate-200 space-y-4">
+                <div class="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto text-2xl">
+                    🔒
                 </div>
-
-                <div style="margin-top: 1.25rem;">
-                    <h:commandButton value="Add to Skill Portfolio"
-                                     action="#{skillBean.addSkill(userBean.currentUser.id)}"
-                                     styleClass="btn btn-primary" />
-                </div>
-            </h:form>
-
-            <!-- Quick Add Shortcuts -->
-            <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #f1f5f9;">
-                <span style="font-size: 0.85rem; color: #64748b; font-weight: 600;">⚡ Quick Add Popular Campus Skills:</span>
-                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
-                    <h:form style="display:inline;">
-                        <h:commandButton value="+ Teach Java" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Java', 'TEACH', 'Expert')}" styleClass="btn btn-outline btn-sm" />
-                    </h:form>
-                    <h:form style="display:inline;">
-                        <h:commandButton value="+ Teach Python" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Python', 'TEACH', 'Expert')}" styleClass="btn btn-outline btn-sm" />
-                    </h:form>
-                    <h:form style="display:inline;">
-                        <h:commandButton value="+ Want Machine Learning" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Machine Learning', 'LEARN', 'Beginner')}" styleClass="btn btn-outline btn-sm" />
-                    </h:form>
-                    <h:form style="display:inline;">
-                        <h:commandButton value="+ Want Figma" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Figma', 'LEARN', 'Beginner')}" styleClass="btn btn-outline btn-sm" />
-                    </h:form>
-                    <h:form style="display:inline;">
-                        <h:commandButton value="+ Teach Web Dev" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Web Development', 'TEACH', 'Expert')}" styleClass="btn btn-outline btn-sm" />
-                    </h:form>
+                <h2 class="font-display font-bold text-2xl text-slate-900">Sign in Required</h2>
+                <p class="text-sm text-slate-500">Please log in to manage your skill portfolio.</p>
+                <div class="pt-2">
+                    <h:link outcome="login" value="Go to Login" styleClass="inline-block w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm transition-all" />
                 </div>
             </div>
         </div>
+    </h:panelGroup>
 
-        <!-- Tables of Skills -->
-        <div class="grid-2">
-            <!-- Skills Offered (Teach) -->
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                    <h3>🎓 Skills I Can Teach (Offered)</h3>
-                    <span class="badge badge-teach">#{skillBean.getSkillsOffered(userBean.currentUser.id).size()} skills</span>
+    <!-- Authenticated Student View -->
+    <h:panelGroup rendered="#{userBean.loggedIn}">
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-72 bg-gradient-to-b from-[#0B192C] via-[#0F223D] to-[#081220] z-50 flex flex-col justify-between text-white border-r border-slate-800/80 transition-transform duration-300 -translate-x-full lg:translate-x-0 shadow-2xl">
+            <div class="flex flex-col flex-1 overflow-y-auto">
+                <div class="h-20 px-6 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/40">
+                    <a href="dashboard.xhtml" class="flex items-center gap-3">
+                        <img src="images/logo.png" alt="SkillSwap Campus Exchange" class="h-9 w-auto object-contain" />
+                    </a>
                 </div>
-                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 1rem;">
-                    Peers searching for these skills will find your mentor profile!
-                </p>
 
-                <h:form id="offeredSkillsForm">
-                    <h:dataTable value="#{skillBean.getSkillsOffered(userBean.currentUser.id)}" var="item"
-                                 styleClass="table-custom"
-                                 rendered="#{not empty skillBean.getSkillsOffered(userBean.currentUser.id)}">
-                        <h:column>
-                            <f:facet name="header">Skill Name</f:facet>
-                            <strong>#{item.skillName}</strong>
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">Proficiency</f:facet>
-                            <span class="badge badge-expert">#{item.proficiencyLevel}</span>
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">Action</f:facet>
-                            <h:commandButton value="Remove" action="#{skillBean.deleteSkill(item.id)}"
-                                             styleClass="btn btn-danger btn-sm"
-                                             onclick="return confirm('Remove this skill?');" />
-                        </h:column>
-                    </h:dataTable>
+                <div class="px-3 py-4 space-y-6">
+                    <div>
+                        <p class="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Platform Navigation</p>
+                        <nav class="space-y-1">
+                            <a href="dashboard.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">grid_view</span>
+                                    <span>Dashboard</span>
+                                </div>
+                            </a>
+                            <a href="skills.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-brand-500/20 to-teal-500/5 text-brand-300 border border-brand-500/30 font-semibold text-sm">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-brand-400 text-[20px]">swap_horiz</span>
+                                    <span>My Skills</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 text-xs font-mono font-bold">#{skillBean.getSkillsOffered(userBean.currentUser.id).size()}</span>
+                            </a>
+                            <a href="search.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">search</span>
+                                    <span>Search Mentors</span>
+                                </div>
+                            </a>
+                            <a href="reverse_match.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">auto_awesome</span>
+                                    <span>Reverse Match</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 text-xs font-mono font-bold">#{searchBean.fetchReverseMatches(userBean.currentUser.id).size()}</span>
+                            </a>
+                            <a href="reputation.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">verified_user</span>
+                                    <span>Reputation &amp; Ratings</span>
+                                </div>
+                            </a>
+                            <a href="leaderboard.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">trophy</span>
+                                    <span>Leaderboard</span>
+                                </div>
+                                <span class="text-amber-400 text-xs font-mono font-semibold">##{leaderboardBean.getUserRank(userBean.currentUser.id)}</span>
+                            </a>
+                            <a href="profile.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">person</span>
+                                    <span>My Profile</span>
+                                </div>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
 
-                    <h:panelGroup rendered="#{empty skillBean.getSkillsOffered(userBean.currentUser.id)}">
-                        <div style="text-align: center; padding: 2rem; color: #94a3b8;">
-                            No teaching skills added yet. Use the form above to add skills you can mentor!
+            <!-- Profile Footer -->
+            <div class="p-4 bg-slate-950/60 border-t border-slate-800/80 space-y-2">
+                <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900/60 border border-slate-800">
+                    <a href="profile.xhtml" class="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-85 transition-opacity" title="View My Profile">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                            #{userBean.currentUser.initials}
                         </div>
-                    </h:panelGroup>
-                </h:form>
-            </div>
-
-            <!-- Skills Wanted (Learn) -->
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                    <h3>🎯 Skills I Want to Learn (Wanted)</h3>
-                    <span class="badge badge-learn">#{skillBean.getSkillsWanted(userBean.currentUser.id).size()} targets</span>
-                </div>
-                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 1rem;">
-                    Used by the Reverse Matching Engine to find mutual exchange partners!
-                </p>
-
-                <h:form id="wantedSkillsForm">
-                    <h:dataTable value="#{skillBean.getSkillsWanted(userBean.currentUser.id)}" var="item"
-                                 styleClass="table-custom"
-                                 rendered="#{not empty skillBean.getSkillsWanted(userBean.currentUser.id)}">
-                        <h:column>
-                            <f:facet name="header">Skill Name</f:facet>
-                            <strong>#{item.skillName}</strong>
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">Proficiency</f:facet>
-                            <span class="badge badge-intermediate">#{item.proficiencyLevel}</span>
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">Action</f:facet>
-                            <h:commandButton value="Remove" action="#{skillBean.deleteSkill(item.id)}"
-                                             styleClass="btn btn-danger btn-sm"
-                                             onclick="return confirm('Remove this skill?');" />
-                        </h:column>
-                    </h:dataTable>
-
-                    <h:panelGroup rendered="#{empty skillBean.getSkillsWanted(userBean.currentUser.id)}">
-                        <div style="text-align: center; padding: 2rem; color: #94a3b8;">
-                            No learning skills added yet. Add what you want to learn to get matched!
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-semibold text-white truncate">#{userBean.currentUser.name}</p>
+                            <p class="text-[10px] text-brand-300 font-mono truncate">#{userBean.currentUser.usn}</p>
                         </div>
-                    </h:panelGroup>
-                </h:form>
+                    </a>
+                    <h:form style="display:inline; margin:0;">
+                        <h:commandLink action="#{userBean.logout}" title="Sign Out" styleClass="text-slate-400 hover:text-rose-400 p-1 rounded transition-colors flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[18px]">logout</span>
+                        </h:commandLink>
+                    </h:form>
+                </div>
             </div>
-        </div>
-    </div>
+        </aside>
 
-    <footer>
-        SkillSwap Project • Module 1: Skill Management • NNM24CS126
-    </footer>
+        <!-- Main Wrapper -->
+        <div class="lg:pl-72 flex flex-col min-h-screen">
+
+            <!-- Top Header -->
+            <header class="sticky top-0 z-30 h-16 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <h2 class="font-display font-bold text-slate-800 text-base">Campus Peer Learning Exchange</h2>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-600 font-medium">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Campus Node Active</span>
+                    </div>
+
+                    <a href="profile.xhtml" class="flex items-center gap-2 hover:opacity-85 transition-opacity" title="View My Profile">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-navy-800 to-brand-600 flex items-center justify-center text-white font-bold text-xs">
+                            #{userBean.currentUser.initials}
+                        </div>
+                        <div class="hidden sm:block text-left">
+                            <p class="text-xs font-bold text-slate-900 leading-tight">#{userBean.currentUser.name}</p>
+                            <p class="text-[11px] text-slate-500 font-mono">#{userBean.currentUser.usn}</p>
+                        </div>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+
+                <!-- Header Card -->
+                <div class="bg-gradient-to-r from-[#0B192C] to-[#112746] rounded-3xl p-6 sm:p-8 text-white shadow-lg border border-slate-800">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="px-3 py-1 rounded-full bg-brand-500/20 text-brand-300 text-xs font-semibold uppercase tracking-wider border border-brand-500/30">Skill Portfolio</span>
+                    </div>
+                    <h1 class="font-display font-extrabold text-2xl sm:text-3xl text-white">Skill Portfolio Management</h1>
+                    <p class="text-slate-300 text-sm mt-1">Add and manage skills you can teach to peer students and skills you want to learn.</p>
+                </div>
+
+                <!-- Global Notifications -->
+                <h:messages globalOnly="true" styleClass="p-4 rounded-2xl bg-teal-50 border border-teal-200 text-teal-900 text-xs font-medium space-y-1"
+                            infoClass="text-teal-800 font-semibold" errorClass="text-rose-700 font-semibold" />
+
+                <!-- Add Skill Form Card -->
+                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+                    <div class="flex items-center gap-2 text-slate-900 font-display font-bold text-lg">
+                        <span class="material-symbols-outlined text-brand-600">add_circle</span>
+                        <span>Add a New Skill</span>
+                    </div>
+
+                    <h:form id="addSkillForm">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    Skill Name <span style="color: #ef4444; font-weight: bold;">*</span>
+                                </label>
+                                <h:inputText id="skillName" value="#{skillBean.newSkillName}"
+                                             styleClass="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm"
+                                             required="true" requiredMessage="Please enter a skill name." />
+                                <h:message for="skillName" styleClass="text-rose-600 text-xs font-medium mt-1 block" />
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Category</label>
+                                <h:selectOneMenu id="skillType" value="#{skillBean.newSkillType}"
+                                                 styleClass="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm bg-white">
+                                    <f:selectItem itemValue="TEACH" itemLabel="🎓 I can TEACH this (Offered)" />
+                                    <f:selectItem itemValue="LEARN" itemLabel="🎯 I want to LEARN this (Wanted)" />
+                                </h:selectOneMenu>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Proficiency</label>
+                                <h:selectOneMenu id="proficiency" value="#{skillBean.newProficiency}"
+                                                 styleClass="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm bg-white">
+                                    <f:selectItem itemValue="Beginner" itemLabel="Beginner" />
+                                    <f:selectItem itemValue="Intermediate" itemLabel="Intermediate" />
+                                    <f:selectItem itemValue="Expert" itemLabel="Expert" />
+                                </h:selectOneMenu>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 flex items-center justify-between flex-wrap gap-3">
+                            <h:commandButton value="Add to Skill Portfolio"
+                                             action="#{skillBean.addSkill(userBean.currentUser.id)}"
+                                             styleClass="px-6 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm shadow-sm transition-all cursor-pointer" />
+                        </div>
+                    </h:form>
+
+                    <!-- Quick Add Shortcuts -->
+                    <div class="pt-4 border-t border-slate-100">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">⚡ Quick Add Popular Campus Skills:</span>
+                        <div class="flex flex-wrap gap-2">
+                            <h:form style="display:inline; margin:0;">
+                                <h:commandButton value="+ Teach Java" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Java', 'TEACH', 'Expert')}" styleClass="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-teal-50 hover:text-teal-700 text-slate-700 text-xs font-semibold transition-colors cursor-pointer" />
+                            </h:form>
+                            <h:form style="display:inline; margin:0;">
+                                <h:commandButton value="+ Teach Python" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Python', 'TEACH', 'Expert')}" styleClass="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-teal-50 hover:text-teal-700 text-slate-700 text-xs font-semibold transition-colors cursor-pointer" />
+                            </h:form>
+                            <h:form style="display:inline; margin:0;">
+                                <h:commandButton value="+ Want Machine Learning" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Machine Learning', 'LEARN', 'Beginner')}" styleClass="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 text-xs font-semibold transition-colors cursor-pointer" />
+                            </h:form>
+                            <h:form style="display:inline; margin:0;">
+                                <h:commandButton value="+ Want Figma" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Figma', 'LEARN', 'Beginner')}" styleClass="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 text-xs font-semibold transition-colors cursor-pointer" />
+                            </h:form>
+                            <h:form style="display:inline; margin:0;">
+                                <h:commandButton value="+ Teach Web Dev" action="#{skillBean.quickAddSkill(userBean.currentUser.id, 'Web Development', 'TEACH', 'Expert')}" styleClass="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-teal-50 hover:text-teal-700 text-slate-700 text-xs font-semibold transition-colors cursor-pointer" />
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two Columns: Offered (Teach) vs Wanted (Learn) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                    <!-- Skills Offered (Teach) -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xl">🎓</span>
+                                <h2 class="font-display font-bold text-slate-900 text-base">Skills I Can Teach (Offered)</h2>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 text-xs font-bold font-mono">
+                                #{skillBean.getSkillsOffered(userBean.currentUser.id).size()} skills
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500">Peers searching for these skills will find your mentor profile!</p>
+
+                        <h:form id="offeredSkillsForm">
+                            <h:dataTable value="#{skillBean.getSkillsOffered(userBean.currentUser.id)}" var="item"
+                                         styleClass="w-full text-left border-collapse text-sm"
+                                         rendered="#{not empty skillBean.getSkillsOffered(userBean.currentUser.id)}">
+                                <h:column>
+                                    <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block">Skill</span></f:facet>
+                                    <span class="font-bold text-slate-800">#{item.skillName}</span>
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block">Proficiency</span></f:facet>
+                                    <span class="px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 text-xs font-semibold">#{item.proficiencyLevel}</span>
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block text-right">Action</span></f:facet>
+                                    <div class="text-right">
+                                        <h:commandButton value="Remove" action="#{skillBean.deleteSkill(item.id)}"
+                                                         styleClass="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 text-xs font-semibold transition-colors cursor-pointer"
+                                                         onclick="return confirm('Remove this skill?');" />
+                                    </div>
+                                </h:column>
+                            </h:dataTable>
+
+                            <h:panelGroup rendered="#{empty skillBean.getSkillsOffered(userBean.currentUser.id)}">
+                                <div class="text-center py-8 text-slate-400 text-sm">
+                                    No teaching skills added yet. Use the form above to add skills you can mentor!
+                                </div>
+                            </h:panelGroup>
+                        </h:form>
+                    </div>
+
+                    <!-- Skills Wanted (Learn) -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xl">🎯</span>
+                                <h2 class="font-display font-bold text-slate-900 text-base">Skills I Want to Learn (Wanted)</h2>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold font-mono">
+                                #{skillBean.getSkillsWanted(userBean.currentUser.id).size()} targets
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500">Used by the Reverse Matching Engine to find mutual exchange partners!</p>
+
+                        <h:form id="wantedSkillsForm">
+                            <h:dataTable value="#{skillBean.getSkillsWanted(userBean.currentUser.id)}" var="item"
+                                         styleClass="w-full text-left border-collapse text-sm"
+                                         rendered="#{not empty skillBean.getSkillsWanted(userBean.currentUser.id)}">
+                                <h:column>
+                                    <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block">Skill</span></f:facet>
+                                    <span class="font-bold text-slate-800">#{item.skillName}</span>
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block">Proficiency</span></f:facet>
+                                    <span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold">#{item.proficiencyLevel}</span>
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block text-right">Action</span></f:facet>
+                                    <div class="text-right">
+                                        <h:commandButton value="Remove" action="#{skillBean.deleteSkill(item.id)}"
+                                                         styleClass="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 text-xs font-semibold transition-colors cursor-pointer"
+                                                         onclick="return confirm('Remove this skill?');" />
+                                    </div>
+                                </h:column>
+                            </h:dataTable>
+
+                            <h:panelGroup rendered="#{empty skillBean.getSkillsWanted(userBean.currentUser.id)}">
+                                <div class="text-center py-8 text-slate-400 text-sm">
+                                    No learning skills added yet. Add what you want to learn to get matched!
+                                </div>
+                            </h:panelGroup>
+                        </h:form>
+                    </div>
+
+                </div>
+
+            </main>
+        </div>
+    </h:panelGroup>
+
 </h:body>
 </html>
