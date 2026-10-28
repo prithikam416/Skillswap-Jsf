@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 68" width="250" height="68">
+  <defs>
+    <linearGradient id="iconGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#14b8a6" />
+      <stop offset="100%" stop-color="#2dd4bf" />
+    </linearGradient>
+  </defs>
+  <!-- Rounded Squircle Icon -->
+  <rect x="4" y="4" width="60" height="60" rx="18" ry="18" fill="url(#iconGrad)" />
+  <!-- Exchange arrows loop -->
+  <path d="M22 41 V25 a5.5 5.5 0 0 1 11 0 v18 a5.5 5.5 0 0 0 11 0 V27" 
+        fill="none" stroke="#081422" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Left arrowhead pointing DOWN -->
+  <path d="M17 36 l5 5.5 5 -5.5" 
+        fill="none" stroke="#081422" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Right arrowhead pointing UP -->
+  <path d="M39 32 l5 -5.5 5 5.5" 
+        fill="none" stroke="#081422" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- SkillSwap Font Typography -->
+  <text x="78" y="37" font-family="'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif" font-size="26" font-weight="800" fill="#ffffff" letter-spacing="-0.5px">Skill<tspan fill="#2dd4bf">Swap</tspan></text>
+  <text x="79" y="54" font-family="'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif" font-size="9.5" font-weight="800" fill="#2dd4bf" letter-spacing="2.8px">CAMPUS EXCHANGE</text>
+</svg>
