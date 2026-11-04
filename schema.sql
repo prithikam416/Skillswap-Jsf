@@ -40,7 +40,11 @@ CREATE TABLE IF NOT EXISTS exchange_requests (
     receiver_id INT NOT NULL,
     skill_name VARCHAR(100) NOT NULL,
     message TEXT,
-    status VARCHAR(20) DEFAULT 'PENDING',
+    status VARCHAR(20) DEFAULT 'PENDING',      -- PENDING, ACCEPTED, REJECTED, COMPLETED, CANCELLED
+    session_date DATETIME NULL,                -- booked session time (set when accepted)
+    session_mode VARCHAR(20) NULL,             -- 'Online' or 'In-Person'
+    session_location VARCHAR(255) NULL,        -- meeting link or campus room
+    response_note TEXT NULL,                   -- receiver's note when accepting / declining
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,

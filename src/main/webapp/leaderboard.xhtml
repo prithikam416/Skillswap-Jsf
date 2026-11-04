@@ -100,7 +100,16 @@
                                     <div class="flex items-center gap-3"><span class="material-symbols-outlined text-slate-400 text-[20px]">auto_awesome</span><span>Reverse Match</span></div>
                                     <span class="px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 text-xs font-mono font-bold">#{searchBean.fetchReverseMatches(userBean.currentUser.id).size()}</span>
                                 </a>
-                                <a href="reputation.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <a href="requests.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">event_available</span>
+                                    <span>Requests &amp; Sessions</span>
+                                </div>
+                                <h:panelGroup rendered="#{exchangeBean.getPendingCount(userBean.currentUser.id) gt 0}">
+                                    <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-mono font-bold">#{exchangeBean.getPendingCount(userBean.currentUser.id)}</span>
+                                </h:panelGroup>
+                            </a>
+                            <a href="reputation.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
                                     <div class="flex items-center gap-3"><span class="material-symbols-outlined text-slate-400 text-[20px]">verified_user</span><span>Reputation &amp; Ratings</span></div>
                                 </a>
                             </h:panelGroup>

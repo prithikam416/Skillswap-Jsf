@@ -20,6 +20,13 @@ public class RatingDAO {
         if (raterId <= 0 || ratedId <= 0 || raterId == ratedId) return false;
         if (score < 1 || score > 5) return false;
 
+        // Only participants of a COMPLETED exchange may rate each other
+        com.skillswap.model.ExchangeRequest ex = new ExchangeRequestDAO().getRequestById(exchangeId);
+        if (ex == null || !"COMPLETED".equalsIgnoreCase(ex.getStatus())) return false;
+        boolean participants = (ex.getSenderId() == raterId && ex.getReceiverId() == ratedId)
+                || (ex.getReceiverId() == raterId && ex.getSenderId() == ratedId);
+        if (!participants) return false;
+
         // Check if already rated this exchange
         if (hasRated(raterId, exchangeId)) return false;
 
@@ -75,6 +82,32 @@ public class RatingDAO {
             if (r.getRaterId() == raterId && r.getExchangeId() == exchangeId) return true;
         }
         return false;
+    }
+
+    /** The review that {@code raterId} wrote for an exchange, or null if none yet. */
+    public Rating getRatingByRater(int raterId, int exchangeId) {
+        if (raterId <= 0 || exchangeId <= 0) return null;
+        if (DBUtil.isDatabaseAvailable()) {
+            String sql = "SELECT rt.*, u.name as rater_name, er.skill_name FROM ratings rt " +
+                         "LEFT JOIN users u ON rt.rater_id = u.id " +
+                         "LEFT JOIN exchange_requests er ON rt.exchange_id = er.id " +
+                         "WHERE rt.rater_id = ? AND rt.exchange_id = ?";
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, raterId);
+                ps.setInt(2, exchangeId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) return mapResultSet(rs);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+        for (Rating r : memoryRatings) {
+            if (r.getRaterId() == raterId && r.getExchangeId() == exchangeId) return r;
+        }
+        return null;
     }
 
     public List<Rating> getRatingsForUser(int userId) {

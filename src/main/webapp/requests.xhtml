@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+<h:head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>SkillSwap - Requests &amp; Sessions</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 300: '#5eead4',
+                            400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e',
+                        },
+                        navy: {
+                            800: '#162d50', 850: '#11223f', 900: '#0b192c', 950: '#060d17',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+</h:head>
+
+<h:body class="bg-[#F8FAFC] font-sans text-slate-800 antialiased min-h-screen">
+
+    <!-- Guest View -->
+    <h:panelGroup rendered="#{!userBean.loggedIn}">
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="max-w-md w-full bg-white rounded-3xl p-8 text-center shadow-xl border border-slate-200 space-y-4">
+                <div class="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto text-2xl">
+                    🔒
+                </div>
+                <h2 class="font-display font-bold text-2xl text-slate-900">Sign in Required</h2>
+                <p class="text-sm text-slate-500">Please log in to manage your requests and sessions.</p>
+                <div class="pt-2">
+                    <h:link outcome="login" value="Go to Login" styleClass="inline-block w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm transition-all" />
+                </div>
+            </div>
+        </div>
+    </h:panelGroup>
+
+    <!-- Authenticated View -->
+    <h:panelGroup rendered="#{userBean.loggedIn}">
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-72 bg-gradient-to-b from-[#0B192C] via-[#0F223D] to-[#081220] z-50 flex flex-col justify-between text-white border-r border-slate-800/80 transition-transform duration-300 -translate-x-full lg:translate-x-0 shadow-2xl">
+            <div class="flex flex-col flex-1 overflow-y-auto">
+                <div class="h-20 px-6 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/40">
+                    <a href="dashboard.xhtml" class="flex items-center gap-3">
+                        <img src="images/logo.png" alt="SkillSwap Campus Exchange" class="h-9 w-auto object-contain" />
+                    </a>
+                </div>
+
+                <div class="px-3 py-4 space-y-6">
+                    <div>
+                        <p class="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Platform Navigation</p>
+                        <nav class="space-y-1">
+                            <a href="dashboard.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">grid_view</span>
+                                    <span>Dashboard</span>
+                                </div>
+                            </a>
+                            <a href="skills.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">swap_horiz</span>
+                                    <span>My Skills</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 text-xs font-mono">#{skillBean.getSkillsOffered(userBean.currentUser.id).size()}</span>
+                            </a>
+                            <a href="search.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">search</span>
+                                    <span>Search Mentors</span>
+                                </div>
+                            </a>
+                            <a href="reverse_match.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">auto_awesome</span>
+                                    <span>Reverse Match</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 text-xs font-mono font-bold">#{searchBean.fetchReverseMatches(userBean.currentUser.id).size()}</span>
+                            </a>
+                            <a href="requests.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">event_available</span>
+                                    <span>Requests &amp; Sessions</span>
+                                </div>
+                                <h:panelGroup rendered="#{exchangeBean.getPendingCount(userBean.currentUser.id) gt 0}">
+                                    <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-mono font-bold">#{exchangeBean.getPendingCount(userBean.currentUser.id)}</span>
+                                </h:panelGroup>
+                            </a>
+                            <a href="reputation.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-brand-500/20 to-teal-500/5 text-brand-300 border border-brand-500/30 font-semibold text-sm">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-brand-400 text-[20px]">verified_user</span>
+                                    <span>Reputation &amp; Ratings</span>
+                                </div>
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span>
+                            </a>
+                            <a href="leaderboard.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">trophy</span>
+                                    <span>Leaderboard</span>
+                                </div>
+                                <span class="text-amber-400 text-xs font-mono font-semibold">##{leaderboardBean.getUserRank(userBean.currentUser.id)}</span>
+                            </a>
+                            <a href="profile.xhtml" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 font-medium text-sm transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-400 text-[20px]">person</span>
+                                    <span>My Profile</span>
+                                </div>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Footer -->
+            <div class="p-4 bg-slate-950/60 border-t border-slate-800/80 space-y-2">
+                <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900/60 border border-slate-800">
+                    <a href="profile.xhtml" class="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-85 transition-opacity" title="View My Profile">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                            #{userBean.currentUser.initials}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-semibold text-white truncate">#{userBean.currentUser.name}</p>
+                            <p class="text-[10px] text-brand-300 font-mono truncate">#{userBean.currentUser.usn}</p>
+                        </div>
+                    </a>
+                    <h:form style="display:inline; margin:0;">
+                        <h:commandLink action="#{userBean.logout}" title="Sign Out" styleClass="text-slate-400 hover:text-rose-400 p-1 rounded transition-colors flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[18px]">logout</span>
+                        </h:commandLink>
+                    </h:form>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="lg:pl-72 flex flex-col min-h-screen">
+
+            <!-- Top Header -->
+            <header class="sticky top-0 z-30 h-16 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <h2 class="font-display font-bold text-slate-800 text-base">Campus Peer Learning Exchange</h2>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-600 font-medium">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Campus Node Active</span>
+                    </div>
+
+                    <a href="profile.xhtml" class="flex items-center gap-2 hover:opacity-85 transition-opacity" title="View My Profile">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-navy-800 to-brand-600 flex items-center justify-center text-white font-bold text-xs">
+                            #{userBean.currentUser.initials}
+                        </div>
+                        <div class="hidden sm:block text-left">
+                            <p class="text-xs font-bold text-slate-900 leading-tight">#{userBean.currentUser.name}</p>
+                            <p class="text-[11px] text-slate-500 font-mono">#{userBean.currentUser.usn}</p>
+                        </div>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+
+                                <!-- Header Banner -->
+                <div class="bg-gradient-to-r from-[#0B192C] to-[#112746] rounded-3xl p-6 sm:p-8 text-white shadow-lg border border-slate-800">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="px-3 py-1 rounded-full bg-brand-500/20 text-brand-300 text-xs font-semibold uppercase tracking-wider border border-brand-500/30">Exchange Management</span>
+                    </div>
+                    <h1 class="font-display font-extrabold text-2xl sm:text-3xl text-white">Requests &amp; Sessions</h1>
+                    <p class="text-slate-300 text-sm mt-1">Accept or reject incoming requests, book learning sessions, mark them completed and leave reviews.</p>
+                </div>
+
+                <!-- Global Notifications -->
+                <h:messages globalOnly="true" styleClass="p-4 rounded-2xl bg-teal-50 border border-teal-200 text-teal-900 text-xs font-medium space-y-1"
+                            infoClass="text-teal-800 font-semibold" errorClass="text-rose-700 font-semibold" />
+
+                <!-- Summary counters -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Incoming</span>
+                        <span class="font-display font-extrabold text-3xl text-amber-600">#{exchangeBean.getPendingCount(userBean.currentUser.id)}</span>
+                        <span class="text-[11px] text-slate-400 block">awaiting your reply</span>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Sent</span>
+                        <span class="font-display font-extrabold text-3xl text-indigo-600">#{exchangeBean.getOutgoingRequests(userBean.currentUser.id).size()}</span>
+                        <span class="text-[11px] text-slate-400 block">requests you made</span>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Upcoming Sessions</span>
+                        <span class="font-display font-extrabold text-3xl text-emerald-600">#{exchangeBean.getConfirmedCount(userBean.currentUser.id)}</span>
+                        <span class="text-[11px] text-slate-400 block">confirmed</span>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                        <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Completed</span>
+                        <span class="font-display font-extrabold text-3xl text-slate-800">#{exchangeBean.getCompletedCount(userBean.currentUser.id)}</span>
+                        <span class="text-[11px] text-slate-400 block">sessions done</span>
+                    </div>
+                </div>
+
+                <!-- ================= 1. INCOMING REQUESTS ================= -->
+                <section class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex items-center gap-2 font-display font-bold text-lg text-slate-900">
+                        <span class="material-symbols-outlined text-amber-500">inbox</span>
+                        <span>Incoming Requests</span>
+                    </div>
+                    <p class="text-xs text-slate-500">Students who want to learn from you. Pick a date and place to accept, or decline with an optional reason.</p>
+
+                    <ui:repeat value="#{exchangeBean.getIncomingRequests(userBean.currentUser.id)}" var="inReq">
+                        <div class="p-5 rounded-2xl border-2 border-amber-200 bg-amber-50/40 space-y-3 mb-4">
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <p class="text-sm font-semibold text-slate-900">
+                                    <strong>#{inReq.senderName}</strong> wants to learn <span class="text-brand-600 underline">#{inReq.skillName}</span> from you
+                                </p>
+                                <span class="text-xs text-slate-400 font-mono">Request ##{inReq.id} • #{inReq.createdAt}</span>
+                            </div>
+                            <blockquote class="p-3 bg-white rounded-xl border border-slate-200 text-xs text-slate-600 italic">“#{inReq.message}”</blockquote>
+
+                            <h:form>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Session date &amp; time</label>
+                                        <h:inputText value="#{exchangeBean.sessionDateInput[inReq.id]}" pt:type="datetime-local"
+                                                     styleClass="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Mode</label>
+                                        <h:selectOneMenu value="#{exchangeBean.sessionModeInput[inReq.id]}" styleClass="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white">
+                                            <f:selectItem itemValue="Online" itemLabel="Online (video call)" />
+                                            <f:selectItem itemValue="In-Person" itemLabel="In-Person (on campus)" />
+                                        </h:selectOneMenu>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Meeting link / room</label>
+                                        <h:inputText value="#{exchangeBean.sessionLocationInput[inReq.id]}" maxlength="200" pt:placeholder="Meet link or Library Room 2"
+                                                     styleClass="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white" />
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Note to student (optional)</label>
+                                    <h:inputText value="#{exchangeBean.responseNoteInput[inReq.id]}" maxlength="250" pt:placeholder="e.g. Bring your laptop with Java installed"
+                                                 styleClass="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white" />
+                                </div>
+                                <div class="flex items-center gap-2 pt-3">
+                                    <h:commandButton action="#{exchangeBean.acceptWithSchedule(inReq.id)}" value="✓ Accept &amp; Book Session"
+                                                     styleClass="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer" />
+                                    <h:commandButton action="#{exchangeBean.declineWithNote(inReq.id)}" value="✕ Decline"
+                                                     styleClass="px-4 py-2 rounded-xl bg-white border border-rose-300 text-rose-600 hover:bg-rose-50 text-xs font-bold cursor-pointer" />
+                                </div>
+                            </h:form>
+                        </div>
+                    </ui:repeat>
+
+                    <h:panelGroup rendered="#{empty exchangeBean.getIncomingRequests(userBean.currentUser.id)}">
+                        <p class="text-xs text-slate-400 italic py-2">No pending requests right now.</p>
+                    </h:panelGroup>
+                </section>
+
+                <!-- ================= 2. SENT REQUESTS ================= -->
+                <section class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex items-center gap-2 font-display font-bold text-lg text-slate-900">
+                        <span class="material-symbols-outlined text-indigo-500">send</span>
+                        <span>Requests I Sent</span>
+                    </div>
+                    <p class="text-xs text-slate-500">Track the status of requests you sent to mentors.</p>
+
+                    <h:form>
+                        <ui:repeat value="#{exchangeBean.getOutgoingRequests(userBean.currentUser.id)}" var="outReq">
+                            <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-wrap items-center justify-between gap-3 mb-3">
+                                <div class="space-y-1">
+                                    <p class="text-sm text-slate-800">
+                                        You asked <strong>#{outReq.receiverName}</strong> to teach <strong class="text-indigo-600">#{outReq.skillName}</strong>
+                                    </p>
+                                    <p class="text-[11px] text-slate-400 font-mono">Request ##{outReq.id} • #{outReq.createdAt}</p>
+                                    <h:panelGroup rendered="#{not empty outReq.responseNote}">
+                                        <p class="text-xs text-slate-600 italic">Reply: “#{outReq.responseNote}”</p>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{outReq.accepted and outReq.scheduled}">
+                                        <p class="text-xs text-emerald-700 font-semibold">Booked: #{outReq.sessionDate} • #{outReq.sessionMode} #{not empty outReq.sessionLocation ? '• ' : ''}#{outReq.sessionLocation}</p>
+                                    </h:panelGroup>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
+                                        #{outReq.pending ? 'bg-amber-100 text-amber-700' : (outReq.accepted ? 'bg-emerald-100 text-emerald-700' : (outReq.completed ? 'bg-slate-800 text-white' : 'bg-rose-100 text-rose-700'))}">#{outReq.status}</span>
+                                    <h:commandButton rendered="#{outReq.pending}" action="#{exchangeBean.cancelRequest(outReq.id)}" value="Withdraw"
+                                                     styleClass="px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-600 hover:bg-slate-100 text-xs font-semibold cursor-pointer" />
+                                </div>
+                            </div>
+                        </ui:repeat>
+                    </h:form>
+
+                    <h:panelGroup rendered="#{empty exchangeBean.getOutgoingRequests(userBean.currentUser.id)}">
+                        <p class="text-xs text-slate-400 italic py-2">You have not sent any requests yet. <a href="search.xhtml" class="text-brand-600 font-semibold underline">Find a mentor →</a></p>
+                    </h:panelGroup>
+                </section>
+
+                <!-- ================= 3. CONFIRMED SESSIONS ================= -->
+                <section class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex items-center gap-2 font-display font-bold text-lg text-slate-900">
+                        <span class="material-symbols-outlined text-emerald-500">event_available</span>
+                        <span>Confirmed Sessions</span>
+                    </div>
+                    <p class="text-xs text-slate-500">Accepted exchanges. After you meet, mark the session completed so both of you can leave a review.</p>
+
+                    <ui:repeat value="#{exchangeBean.getConfirmedSessions(userBean.currentUser.id)}" var="sess">
+                        <div class="p-5 rounded-2xl border-2 border-emerald-200 bg-emerald-50/40 space-y-3 mb-4">
+                            <div class="flex items-start justify-between flex-wrap gap-2">
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-900">
+                                        #{sess.skillName} <span class="text-slate-400 font-normal">with</span> #{sess.getPartnerName(userBean.currentUser.id)}
+                                    </p>
+                                    <p class="text-[11px] text-slate-500">You are <strong>#{sess.getRole(userBean.currentUser.id)}</strong> • Request ##{sess.id}</p>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">Confirmed</span>
+                            </div>
+
+                            <h:panelGroup rendered="#{sess.scheduled}">
+                                <div class="p-3 bg-white rounded-xl border border-emerald-200 text-xs text-slate-700 space-y-0.5">
+                                    <p><strong>When:</strong> #{sess.sessionDate}</p>
+                                    <p><strong>Mode:</strong> #{sess.sessionMode}</p>
+                                    <p><strong>Where / link:</strong> #{empty sess.sessionLocation ? 'To be shared by the mentor' : sess.sessionLocation}</p>
+                                    <h:panelGroup rendered="#{not empty sess.responseNote}"><p><strong>Note:</strong> #{sess.responseNote}</p></h:panelGroup>
+                                </div>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{not sess.scheduled}">
+                                <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3">No date fixed yet — use “Set / change schedule” below.</p>
+                            </h:panelGroup>
+
+                            <h:form>
+                                <details class="mb-3">
+                                    <summary class="cursor-pointer text-xs font-semibold text-brand-600">Set / change schedule</summary>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+                                        <h:inputText value="#{exchangeBean.sessionDateInput[sess.id]}" pt:type="datetime-local"
+                                                     styleClass="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white" />
+                                        <h:selectOneMenu value="#{exchangeBean.sessionModeInput[sess.id]}" styleClass="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white">
+                                            <f:selectItem itemValue="Online" itemLabel="Online (video call)" />
+                                            <f:selectItem itemValue="In-Person" itemLabel="In-Person (on campus)" />
+                                        </h:selectOneMenu>
+                                        <h:inputText value="#{exchangeBean.sessionLocationInput[sess.id]}" maxlength="200" pt:placeholder="Meet link or room"
+                                                     styleClass="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white" />
+                                    </div>
+                                    <div class="pt-3">
+                                        <h:commandButton action="#{exchangeBean.updateSchedule(sess.id)}" value="Save Schedule"
+                                                         styleClass="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold cursor-pointer" />
+                                    </div>
+                                </details>
+                                <h:commandButton action="#{exchangeBean.completeRequest(sess.id)}" value="✔ Mark Completed"
+                                                 styleClass="px-4 py-2 rounded-xl bg-navy-800 hover:bg-slate-900 text-white text-xs font-bold cursor-pointer" />
+                            </h:form>
+                        </div>
+                    </ui:repeat>
+
+                    <h:panelGroup rendered="#{empty exchangeBean.getConfirmedSessions(userBean.currentUser.id)}">
+                        <p class="text-xs text-slate-400 italic py-2">No confirmed sessions yet. Accept an incoming request to create one.</p>
+                    </h:panelGroup>
+                </section>
+
+                <!-- ================= 4. HISTORY & REVIEWS ================= -->
+                <section class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex items-center gap-2 font-display font-bold text-lg text-slate-900">
+                        <span class="material-symbols-outlined text-amber-500">rate_review</span>
+                        <span>History &amp; Reviews</span>
+                    </div>
+                    <p class="text-xs text-slate-500">Completed, declined and withdrawn exchanges. Review your partner after a completed session.</p>
+
+                    <ui:repeat value="#{exchangeBean.getHistory(userBean.currentUser.id)}" var="h">
+                        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-3 mb-3">
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <p class="text-sm text-slate-800"><strong>#{h.skillName}</strong> with #{h.getPartnerName(userBean.currentUser.id)}
+                                    <span class="text-[11px] text-slate-400">(you: #{h.getRole(userBean.currentUser.id)})</span></p>
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
+                                    #{h.completed ? 'bg-slate-800 text-white' : 'bg-rose-100 text-rose-700'}">#{h.status}</span>
+                            </div>
+                            <h:panelGroup rendered="#{h.rejected and not empty h.responseNote}">
+                                <p class="text-xs text-slate-600 italic">Reason: “#{h.responseNote}”</p>
+                            </h:panelGroup>
+
+                            <!-- Reviews only exist for completed sessions -->
+                            <h:panelGroup rendered="#{h.completed}">
+                                <h:panelGroup rendered="#{ratingBean.getReviewOfMe(h.id, userBean.currentUser.id) != null}">
+                                    <div class="p-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-700">
+                                        <strong>#{h.getPartnerName(userBean.currentUser.id)} reviewed you:</strong>
+                                        ⭐ #{ratingBean.getReviewOfMe(h.id, userBean.currentUser.id).score}/5
+                                        <span class="italic">“#{ratingBean.getReviewOfMe(h.id, userBean.currentUser.id).feedback}”</span>
+                                    </div>
+                                </h:panelGroup>
+
+                                <h:panelGroup rendered="#{ratingBean.getMyReview(h.id, userBean.currentUser.id) != null}">
+                                    <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">
+                                        <strong>Your review:</strong> ⭐ #{ratingBean.getMyReview(h.id, userBean.currentUser.id).score}/5
+                                        <span class="italic">“#{ratingBean.getMyReview(h.id, userBean.currentUser.id).feedback}”</span>
+                                    </div>
+                                </h:panelGroup>
+
+                                <h:panelGroup rendered="#{ratingBean.getMyReview(h.id, userBean.currentUser.id) == null}">
+                                    <h:form>
+                                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                                            <div>
+                                                <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Stars</label>
+                                                <h:selectOneMenu value="#{ratingBean.reviewScoreInput[h.id]}" styleClass="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white">
+                                                    <f:selectItem itemValue="5" itemLabel="⭐⭐⭐⭐⭐ 5 - Outstanding" />
+                                                    <f:selectItem itemValue="4" itemLabel="⭐⭐⭐⭐ 4 - Very good" />
+                                                    <f:selectItem itemValue="3" itemLabel="⭐⭐⭐ 3 - Satisfactory" />
+                                                    <f:selectItem itemValue="2" itemLabel="⭐⭐ 2 - Needs improvement" />
+                                                    <f:selectItem itemValue="1" itemLabel="⭐ 1 - Unsatisfactory" />
+                                                </h:selectOneMenu>
+                                            </div>
+                                            <div class="md:col-span-2">
+                                                <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">Review</label>
+                                                <h:inputText value="#{ratingBean.reviewTextInput[h.id]}" maxlength="400" pt:placeholder="How was the session?"
+                                                             styleClass="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white" />
+                                            </div>
+                                            <h:commandButton action="#{ratingBean.submitReview(h.id, userBean.currentUser.id)}" value="Submit Review"
+                                                             styleClass="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold cursor-pointer" />
+                                        </div>
+                                    </h:form>
+                                </h:panelGroup>
+                            </h:panelGroup>
+                        </div>
+                    </ui:repeat>
+
+                    <h:panelGroup rendered="#{empty exchangeBean.getHistory(userBean.currentUser.id)}">
+                        <p class="text-xs text-slate-400 italic py-2">Nothing here yet. Finished exchanges will show up in this list.</p>
+                    </h:panelGroup>
+                </section>
+
+            </main>
+        </div>
+    </h:panelGroup>
+
+</h:body>
+</html>
