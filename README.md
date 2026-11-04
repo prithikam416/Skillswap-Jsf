@@ -37,11 +37,27 @@ SkillSwap is a JavaServer Faces (JSF) web application built for college campuses
 
 ---
 
+## 🚀 Person 3 Modules & Features (Exchange Requests, Sessions & Reviews)
+
+- **Requests & Sessions page (`requests.xhtml`)** – one place to manage the whole exchange life-cycle:
+  - **Incoming requests** – Accept & book a session (date/time, Online/In-Person, link or room, note) or Decline with a reason.
+  - **Requests I sent** – live status (PENDING / ACCEPTED / REJECTED / COMPLETED / CANCELLED), decline reason, booked session details, Withdraw button.
+  - **Confirmed sessions** – shows when/where, change the schedule, **Mark Completed**.
+  - **History & Reviews** – completed / declined / withdrawn exchanges; leave a 1-5 star review and read your partner's review.
+- **Database layer** – `ExchangeRequestDAO`, `RatingDAO`, `DBUtil`:
+  - Status changes are single guarded SQL `UPDATE`s (`... WHERE id=? AND receiver_id=? AND status='PENDING'`) so only the right person can do the right transition.
+  - Tables and the new session columns are **created automatically** on first start (`DBUtil.ensureSchema`).
+  - DB credentials can be changed with env vars `SKILLSWAP_DB_USER`, `SKILLSWAP_DB_PASSWORD`, `SKILLSWAP_DB_URL` (defaults: root/root on localhost).
+  - Reviews are only allowed for COMPLETED exchanges, only between the two participants, once each; reputation score is recalculated after every review.
+- See `PERSON3_GUIDE.md` for the full explanation, demo script and viva answers.
+
+---
+
 ## 🛠 Tech Stack
 
 - **Frontend**: JSF 2.3 (JavaServer Faces), XHTML, CSS3
 - **Backend**: Java 21, Managed Beans (`@ManagedBean`, `@SessionScoped`)
-- **Persistence**: MySQL JDBC with auto-detection & resilient in-memory fallback
+- **Persistence**: MySQL via plain JDBC (DAO pattern, `PreparedStatement`s) with auto-detection & resilient in-memory fallback
 - **Server**: Apache Tomcat v9.0
 
 ---

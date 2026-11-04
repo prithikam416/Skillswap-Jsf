@@ -59,6 +59,33 @@ public class ExchangeRequest implements Serializable {
     public String getReceiverName() { return receiverName != null ? receiverName : "Student #" + receiverId; }
     public void setReceiverName(String receiverName) { this.receiverName = receiverName; }
 
+    // ---- Session scheduling (set when a request is accepted) ----
+    // sessionDate is stored as "yyyy-MM-dd HH:mm" text for easy display
+    private String sessionDate;
+    private String sessionMode;      // "Online" or "In-Person"
+    private String sessionLocation;  // meeting link or campus room
+    private String responseNote;     // note from the receiver when accepting / declining
+
+    public String getSessionDate() { return sessionDate; }
+    public void setSessionDate(String sessionDate) { this.sessionDate = sessionDate; }
+
+    public String getSessionMode() { return sessionMode; }
+    public void setSessionMode(String sessionMode) { this.sessionMode = sessionMode; }
+
+    public String getSessionLocation() { return sessionLocation; }
+    public void setSessionLocation(String sessionLocation) { this.sessionLocation = sessionLocation; }
+
+    public String getResponseNote() { return responseNote; }
+    public void setResponseNote(String responseNote) { this.responseNote = responseNote; }
+
+    public boolean isScheduled() {
+        return sessionDate != null && !sessionDate.trim().isEmpty();
+    }
+
+    public boolean isCancelled() {
+        return "CANCELLED".equalsIgnoreCase(status);
+    }
+
     public String getPartnerName(int currentUserId) {
         if (currentUserId == senderId) {
             return getReceiverName();
