@@ -81,7 +81,7 @@ public class AuthFilter implements Filter {
         }
 
         // 2. Protected Student Pages Access Control
-        boolean isPublicPage = isIndexPage || isLoginPage || isRegisterPage || requestURI.endsWith("/search.xhtml");
+        boolean isPublicPage = isIndexPage || isLoginPage || isRegisterPage || requestURI.endsWith("/verify.xhtml") || requestURI.endsWith("/search.xhtml");
         if (!isPublicPage && !isAdminPage) {
             if (!isLoggedIn) {
                 res.sendRedirect(contextPath + "/login.xhtml");

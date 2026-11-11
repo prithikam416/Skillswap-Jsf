@@ -235,6 +235,15 @@
                             </div>
                         </div>
 
+                        <div class="mt-4">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Category (optional)</label>
+                            <h:selectOneMenu id="skillCategory" value="#{skillBean.newCategory}"
+                                             styleClass="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white">
+                                <f:selectItem itemValue="" itemLabel="Auto-detect" />
+                                <f:selectItems value="#{skillBean.categoryOptions}" />
+                            </h:selectOneMenu>
+                        </div>
+
                         <div class="mt-4 flex items-center justify-between flex-wrap gap-3">
                             <h:commandButton value="Add to Skill Portfolio"
                                              action="#{skillBean.addSkill(userBean.currentUser.id)}"
@@ -287,7 +296,7 @@
                                          rendered="#{not empty skillBean.getSkillsOffered(userBean.currentUser.id)}">
                                 <h:column>
                                     <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block">Skill</span></f:facet>
-                                    <span class="font-bold text-slate-800">#{item.skillName}</span>
+                                    <span class="font-bold text-slate-800">#{item.skillName}</span> <span class="text-[10px] text-slate-400">#{skillBean.categoryOf(item.skillName)}</span>
                                 </h:column>
                                 <h:column>
                                     <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block">Proficiency</span></f:facet>
@@ -330,7 +339,7 @@
                                          rendered="#{not empty skillBean.getSkillsWanted(userBean.currentUser.id)}">
                                 <h:column>
                                     <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block">Skill</span></f:facet>
-                                    <span class="font-bold text-slate-800">#{item.skillName}</span>
+                                    <span class="font-bold text-slate-800">#{item.skillName}</span> <span class="text-[10px] text-slate-400">#{skillBean.categoryOf(item.skillName)}</span>
                                 </h:column>
                                 <h:column>
                                     <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block">Proficiency</span></f:facet>

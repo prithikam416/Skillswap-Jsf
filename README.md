@@ -70,3 +70,25 @@ SkillSwap is a JavaServer Faces (JSF) web application built for college campuses
 4. (Optional) Run `schema.sql` in MySQL to initialize the database tables and seed data.
 5. Right-click `index.xhtml` $\rightarrow$ **Run As** $\rightarrow$ **Run on Server** $\rightarrow$ Select **Apache Tomcat v9.0** $\rightarrow$ **Finish**.
 6. Access the home page at: `http://localhost:8080/SkillSwapJSF/index.xhtml`.
+
+## Abstract alignment update (branch `abstract-alignment`)
+- **Six-table model**: `users`, `skills` (catalogue + category), `user_skills`, `exchange_requests`, `sessions`, `ratings`. Existing databases are migrated automatically on first start (session columns move into `sessions`, skill names are normalised into `skills`).
+- **Reputation** = 60% average rating + 25% sessions completed + 15% consistency (see `ReputationCalculator`).
+- **Category leaderboards**: "Top <Category> Mentors" on the Leaderboard page.
+
+## JPA / Hibernate (branch `jpa-hibernate`)
+- Hibernate 5.6.15 (jars in `WEB-INF/lib`) maps the six tables to entities in `com.skillswap.entity`:
+  `UserEntity`, `SkillEntity`, `UserSkillEntity`, `ExchangeRequestEntity`, `SessionEntity`, `RatingEntity`
+  (relationships: request -> sender/receiver users, request <-> session 1:1, rating -> rater/rated/request).
+- `ExchangeRequestDAO` and `RatingDAO` (requests, accept/reject, sessions, reviews) now use JPA queries (JPQL) and
+  transactions instead of hand-written SQL. Login/skills/admin DAOs still use JDBC against the same tables.
+- `JpaUtil` builds the persistence unit in code from the same DB settings as `DBUtil` (no persistence.xml needed);
+  `DBUtil` still creates/migrates the tables automatically. Without MySQL the in-memory fallback still works.
+
+## Matches the project abstract (branch `abstract-complete`)
+- **Six entities / tables:** `users`, `skills`, `user_skills`, `learning_requests`, `sessions`, `reviews` (older databases are renamed automatically).
+- **Verified campus accounts:** registration only accepts college emails (default `@nmamit.in`; change with the
+  `SKILLSWAP_COLLEGE_DOMAINS` environment variable or `-Dskillswap.college.domains=...`) and the student must enter a
+  6-digit code sent by email before the first login (`verify.xhtml`). Without SMTP settings in `email.properties`
+  the code is shown on the page (demo mode).
+- **Three roles:** Student (Learner), Skill Provider (Mentor) - derived from the skills the student lists and shown on the dashboard - and Administrator.

@@ -216,6 +216,57 @@
                     </h:form>
                 </div>
 
+                <!-- Category-wise mentor leaderboard -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                    <h2 class="font-display font-bold text-slate-900 text-lg">Top Mentors by Category</h2>
+                    <h:form id="categoryForm">
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <h:selectOneMenu id="categorySelect" value="#{leaderboardBean.selectedCategory}"
+                                             styleClass="flex-1 px-4 py-2.5 rounded-2xl border border-slate-300 text-sm">
+                                <f:selectItem itemLabel="Choose a category..." itemValue="" />
+                                <f:selectItems value="#{leaderboardBean.categories}" />
+                            </h:selectOneMenu>
+                            <h:commandButton id="categoryBtn" value="Show Top Mentors" styleClass="px-6 py-2.5 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm shadow-sm cursor-pointer whitespace-nowrap" />
+                        </div>
+                    </h:form>
+
+                    <h:panelGroup rendered="#{not empty leaderboardBean.selectedCategory}">
+                        <h3 class="font-bold text-slate-800 text-sm mb-2">#{leaderboardBean.topMentorTitle}</h3>
+                        <h:dataTable value="#{leaderboardBean.categoryLeaderboard}" var="cm"
+                                     styleClass="w-full text-left border-collapse text-sm"
+                                     rendered="#{not empty leaderboardBean.categoryLeaderboard}">
+                            <h:column>
+                                <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block">Rank</span></f:facet>
+                                <span class="font-black">##{cm.rank}</span>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block">Mentor</span></f:facet>
+                                <span class="font-bold text-slate-900">#{cm.student.name}</span>
+                                <span class="text-[11px] text-slate-500 font-mono"> #{cm.student.usn}</span>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block">Skills</span></f:facet>
+                                <span class="text-xs text-slate-600">#{cm.skillsSummary}</span>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block">Sessions</span></f:facet>
+                                #{cm.completedExchanges}
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block">Rating</span></f:facet>
+                                <span class="text-amber-500 font-bold text-xs">⭐ #{cm.averageRating > 0 ? cm.averageRating : 'New'} (#{cm.totalRatings})</span>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"><span class="text-xs uppercase font-bold text-slate-400 pb-2 block">Points</span></f:facet>
+                                <span class="font-extrabold text-brand-600">#{cm.totalPoints} pts</span>
+                            </h:column>
+                        </h:dataTable>
+                        <h:panelGroup rendered="#{empty leaderboardBean.categoryLeaderboard}">
+                            <p class="text-xs text-slate-500 py-4">No completed sessions in this category yet.</p>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </div>
+
                 <!-- Full Leaderboard Table -->
                 <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
                     <h2 class="font-display font-bold text-slate-900 text-lg">Overall Campus Ranking</h2>

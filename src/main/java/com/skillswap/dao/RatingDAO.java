@@ -1,16 +1,26 @@
 package com.skillswap.dao;
 
+import com.skillswap.entity.ExchangeRequestEntity;
+import com.skillswap.entity.RatingEntity;
+import com.skillswap.entity.UserEntity;
 import com.skillswap.model.Rating;
 import com.skillswap.model.User;
-import com.skillswap.util.DBUtil;
+import com.skillswap.util.JpaUtil;
 
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
+/**
+ * Reviews. With MySQL available they are stored through JPA/Hibernate (RatingEntity);
+ * otherwise an in-memory list is used.
+ */
 public class RatingDAO {
+
+    private static final String FETCH =
+            "select r from RatingEntity r join fetch r.rater join fetch r.rated join fetch r.exchange ";
 
     private static final List<Rating> memoryRatings = new CopyOnWriteArrayList<>();
     private static final AtomicInteger idCounter = new AtomicInteger(1);
@@ -30,21 +40,18 @@ public class RatingDAO {
         // Check if already rated this exchange
         if (hasRated(raterId, exchangeId)) return false;
 
-        if (DBUtil.isDatabaseAvailable()) {
-            String sql = "INSERT INTO ratings (rater_id, rated_id, exchange_id, score, feedback) VALUES (?, ?, ?, ?, ?)";
-            try (Connection conn = DBUtil.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, raterId);
-                ps.setInt(2, ratedId);
-                ps.setInt(3, exchangeId);
-                ps.setInt(4, score);
-                ps.setString(5, feedback != null ? feedback.trim() : "");
-                boolean ok = ps.executeUpdate() > 0;
-                if (ok) {
-                    recalculateReputation(ratedId);
-                }
-                return ok;
-            } catch (SQLException e) {
+        String text = feedback != null ? feedback.trim() : "";
+        if (JpaUtil.isAvailable()) {
+            try {
+                JpaUtil.write(em -> {
+                    em.persist(new RatingEntity(em.getReference(UserEntity.class, raterId),
+                            em.getReference(UserEntity.class, ratedId),
+                            em.getReference(ExchangeRequestEntity.class, exchangeId), score, text));
+                    return true;
+                });
+                recalculateReputation(ratedId);
+                return true;
+            } catch (RuntimeException e) {
                 e.printStackTrace();
                 return false;
             }
@@ -56,7 +63,7 @@ public class RatingDAO {
         r.setRatedId(ratedId);
         r.setExchangeId(exchangeId);
         r.setScore(score);
-        r.setFeedback(feedback != null ? feedback.trim() : "");
+        r.setFeedback(text);
         r.setCreatedAt(new java.util.Date().toString());
         memoryRatings.add(r);
         recalculateReputation(ratedId);
@@ -65,17 +72,14 @@ public class RatingDAO {
 
     public boolean hasRated(int raterId, int exchangeId) {
         if (raterId <= 0 || exchangeId <= 0) return false;
-        if (DBUtil.isDatabaseAvailable()) {
-            String sql = "SELECT COUNT(*) FROM ratings WHERE rater_id = ? AND exchange_id = ?";
-            try (Connection conn = DBUtil.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, raterId);
-                ps.setInt(2, exchangeId);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) return rs.getInt(1) > 0;
-                }
-            } catch (SQLException e) {
+        if (JpaUtil.isAvailable()) {
+            try {
+                return JpaUtil.read(em -> em.createQuery(
+                        "select count(r) from RatingEntity r where r.rater.id = :u and r.exchange.id = :x", Long.class)
+                        .setParameter("u", raterId).setParameter("x", exchangeId).getSingleResult() > 0);
+            } catch (RuntimeException e) {
                 e.printStackTrace();
+                return false;
             }
         }
         for (Rating r : memoryRatings) {
@@ -87,22 +91,17 @@ public class RatingDAO {
     /** The review that {@code raterId} wrote for an exchange, or null if none yet. */
     public Rating getRatingByRater(int raterId, int exchangeId) {
         if (raterId <= 0 || exchangeId <= 0) return null;
-        if (DBUtil.isDatabaseAvailable()) {
-            String sql = "SELECT rt.*, u.name as rater_name, er.skill_name FROM ratings rt " +
-                         "LEFT JOIN users u ON rt.rater_id = u.id " +
-                         "LEFT JOIN exchange_requests er ON rt.exchange_id = er.id " +
-                         "WHERE rt.rater_id = ? AND rt.exchange_id = ?";
-            try (Connection conn = DBUtil.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, raterId);
-                ps.setInt(2, exchangeId);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) return mapResultSet(rs);
-                }
-            } catch (SQLException e) {
+        if (JpaUtil.isAvailable()) {
+            try {
+                return JpaUtil.read(em -> {
+                    List<RatingEntity> list = em.createQuery(FETCH + "where r.rater.id = :u and r.exchange.id = :x", RatingEntity.class)
+                            .setParameter("u", raterId).setParameter("x", exchangeId).getResultList();
+                    return list.isEmpty() ? null : toModel(list.get(0));
+                });
+            } catch (RuntimeException e) {
                 e.printStackTrace();
+                return null;
             }
-            return null;
         }
         for (Rating r : memoryRatings) {
             if (r.getRaterId() == raterId && r.getExchangeId() == exchangeId) return r;
@@ -112,23 +111,14 @@ public class RatingDAO {
 
     public List<Rating> getRatingsForUser(int userId) {
         if (userId <= 0) return new ArrayList<>();
-        if (DBUtil.isDatabaseAvailable()) {
-            List<Rating> list = new ArrayList<>();
-            String sql = "SELECT rt.*, u.name as rater_name, er.skill_name FROM ratings rt " +
-                         "LEFT JOIN users u ON rt.rater_id = u.id " +
-                         "LEFT JOIN exchange_requests er ON rt.exchange_id = er.id " +
-                         "WHERE rt.rated_id = ? ORDER BY rt.created_at DESC";
-            try (Connection conn = DBUtil.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, userId);
-                try (ResultSet rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        list.add(mapResultSet(rs));
-                    }
-                }
-                return list;
-            } catch (SQLException e) {
+        if (JpaUtil.isAvailable()) {
+            try {
+                return JpaUtil.read(em -> em.createQuery(FETCH + "where r.rated.id = :u order by r.createdAt desc, r.id desc", RatingEntity.class)
+                        .setParameter("u", userId).getResultList().stream()
+                        .map(RatingDAO::toModel).collect(Collectors.toList()));
+            } catch (RuntimeException e) {
                 e.printStackTrace();
+                return new ArrayList<>();
             }
         }
         List<Rating> result = new ArrayList<>();
@@ -148,19 +138,14 @@ public class RatingDAO {
 
     public double getAverageRating(int userId) {
         if (userId <= 0) return 0.0;
-        if (DBUtil.isDatabaseAvailable()) {
-            String sql = "SELECT AVG(score) FROM ratings WHERE rated_id = ?";
-            try (Connection conn = DBUtil.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, userId);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        double avg = rs.getDouble(1);
-                        return Math.round(avg * 10.0) / 10.0;
-                    }
-                }
-            } catch (SQLException e) {
+        if (JpaUtil.isAvailable()) {
+            try {
+                Double avg = JpaUtil.read(em -> em.createQuery("select avg(r.score) from RatingEntity r where r.rated.id = :u", Double.class)
+                        .setParameter("u", userId).getSingleResult());
+                return avg == null ? 0.0 : Math.round(avg * 10.0) / 10.0;
+            } catch (RuntimeException e) {
                 e.printStackTrace();
+                return 0.0;
             }
         }
         List<Rating> ratings = getRatingsForUser(userId);
@@ -172,59 +157,53 @@ public class RatingDAO {
 
     public int getRatingCount(int userId) {
         if (userId <= 0) return 0;
-        if (DBUtil.isDatabaseAvailable()) {
-            String sql = "SELECT COUNT(*) FROM ratings WHERE rated_id = ?";
-            try (Connection conn = DBUtil.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, userId);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) return rs.getInt(1);
-                }
-            } catch (SQLException e) {
+        if (JpaUtil.isAvailable()) {
+            try {
+                return JpaUtil.read(em -> em.createQuery("select count(r) from RatingEntity r where r.rated.id = :u", Long.class)
+                        .setParameter("u", userId).getSingleResult().intValue());
+            } catch (RuntimeException e) {
                 e.printStackTrace();
+                return 0;
             }
         }
         return getRatingsForUser(userId).size();
     }
 
+    /** Recomputes the reputation score from average rating, completed sessions and consistency. */
     public void recalculateReputation(int userId) {
+        ExchangeRequestDAO requests = new ExchangeRequestDAO();
         double avg = getAverageRating(userId);
-        userDAO.updateReputationScore(userId, avg);
+        int ratings = getRatingCount(userId);
+        int completed = requests.getCompletedExchangesForUser(userId).size();
+        int missed = requests.getMissedSessionCount(userId);
+        userDAO.updateReputationScore(userId, com.skillswap.util.ReputationCalculator.compute(avg, ratings, completed, missed));
     }
 
     public List<Rating> getAllRatings() {
-        if (DBUtil.isDatabaseAvailable()) {
-            List<Rating> list = new ArrayList<>();
-            String sql = "SELECT rt.*, u1.name as rater_name, u2.name as rated_name, er.skill_name FROM ratings rt " +
-                         "LEFT JOIN users u1 ON rt.rater_id = u1.id LEFT JOIN users u2 ON rt.rated_id = u2.id " +
-                         "LEFT JOIN exchange_requests er ON rt.exchange_id = er.id ORDER BY rt.created_at DESC";
-            try (Connection conn = DBUtil.getConnection();
-                 Statement st = conn.createStatement();
-                 ResultSet rs = st.executeQuery(sql)) {
-                while (rs.next()) {
-                    list.add(mapResultSet(rs));
-                }
-                return list;
-            } catch (SQLException e) {
+        if (JpaUtil.isAvailable()) {
+            try {
+                return JpaUtil.read(em -> em.createQuery(FETCH + "order by r.createdAt desc, r.id desc", RatingEntity.class)
+                        .getResultList().stream().map(RatingDAO::toModel).collect(Collectors.toList()));
+            } catch (RuntimeException e) {
                 e.printStackTrace();
+                return new ArrayList<>();
             }
         }
         return new ArrayList<>(memoryRatings);
     }
 
-    private Rating mapResultSet(ResultSet rs) throws SQLException {
+    private static Rating toModel(RatingEntity e) {
         Rating r = new Rating();
-        r.setId(rs.getInt("id"));
-        r.setRaterId(rs.getInt("rater_id"));
-        r.setRatedId(rs.getInt("rated_id"));
-        r.setExchangeId(rs.getInt("exchange_id"));
-        r.setScore(rs.getInt("score"));
-        r.setFeedback(rs.getString("feedback"));
-        try { r.setRaterName(rs.getString("rater_name")); } catch (SQLException e) { /* ignore */ }
-        try { r.setRatedName(rs.getString("rated_name")); } catch (SQLException e) { /* ignore */ }
-        try { r.setSkillName(rs.getString("skill_name")); } catch (SQLException e) { /* ignore */ }
-        Timestamp ts = rs.getTimestamp("created_at");
-        if (ts != null) r.setCreatedAt(ts.toString());
+        r.setId(e.getId());
+        r.setRaterId(e.getRater().getId());
+        r.setRatedId(e.getRated().getId());
+        r.setExchangeId(e.getExchange().getId());
+        r.setScore(e.getScore());
+        r.setFeedback(e.getFeedback());
+        r.setRaterName(e.getRater().getName());
+        r.setRatedName(e.getRated().getName());
+        r.setSkillName(e.getExchange().getSkillName());
+        if (e.getCreatedAt() != null) r.setCreatedAt(e.getCreatedAt().toString());
         return r;
     }
 }

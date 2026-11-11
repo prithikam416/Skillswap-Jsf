@@ -15,6 +15,10 @@ public class User implements Serializable {
     private double reputationScore = 4.5;
     private String role = "STUDENT";
     private boolean active = true;
+    private boolean emailVerified = true;     // false until the college-email code has been confirmed
+    private String verifyCode;                // only used for the in-memory fallback
+    private long verifyExpires;
+
     private String createdAt;
 
     public User() {}
@@ -119,6 +123,13 @@ public class User implements Serializable {
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
+
+    public boolean isEmailVerified() { return emailVerified; }
+    public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
+    public String getVerifyCode() { return verifyCode; }
+    public void setVerifyCode(String verifyCode) { this.verifyCode = verifyCode; }
+    public long getVerifyExpires() { return verifyExpires; }
+    public void setVerifyExpires(long verifyExpires) { this.verifyExpires = verifyExpires; }
 
     public boolean isAdmin() {
         return "ADMIN".equalsIgnoreCase(role);

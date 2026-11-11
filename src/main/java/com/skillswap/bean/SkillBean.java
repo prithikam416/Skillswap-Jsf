@@ -21,7 +21,14 @@ public class SkillBean implements Serializable {
     private String newSkillType = "TEACH"; // Default to "Skills I Can Teach"
     private String newProficiency = "Intermediate";
 
+    private String newCategory = "";
+
     public SkillBean() {}
+
+    public String getNewCategory() { return newCategory; }
+    public void setNewCategory(String c) { this.newCategory = c == null ? "" : c; }
+    public java.util.List<String> getCategoryOptions() { return com.skillswap.util.SkillCatalog.CATEGORIES; }
+    public String categoryOf(String skillName) { return skillDAO.getCategory(skillName); }
 
     public String addSkill(int userId) {
         if (newSkillName == null || newSkillName.trim().isEmpty()) {
@@ -29,11 +36,12 @@ public class SkillBean implements Serializable {
             return null;
         }
 
-        boolean ok = skillDAO.addSkill(userId, newSkillName.trim(), newSkillType, newProficiency);
+        boolean ok = skillDAO.addSkill(userId, newSkillName.trim(), newSkillType, newProficiency, newCategory);
         if (ok) {
             String label = newSkillType.equals("TEACH") ? "Offered (Teach)" : "Wanted (Learn)";
             addInfoMessage("Added '" + newSkillName.trim() + "' (" + newProficiency + ") to your " + label + " skills!");
             newSkillName = "";
+            newCategory = "";
         } else {
             addErrorMessage("Could not add skill: Already in your list or invalid input.");
         }

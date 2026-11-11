@@ -4,6 +4,7 @@ import com.skillswap.model.MatchResult;
 import com.skillswap.model.User;
 import com.skillswap.model.UserSkill;
 import com.skillswap.util.DBUtil;
+import com.skillswap.util.SkillCatalog;
 
 import java.sql.*;
 import java.util.*;
@@ -16,11 +17,24 @@ public class SkillDAO {
     private static final AtomicInteger skillIdCounter = new AtomicInteger(1);
     private final UserDAO userDAO = new UserDAO();
 
+    // In-memory skills catalogue (used only when MySQL is not available): lower-case name -> {name, category}
+    private static final Map<String, String[]> memoryCatalogue = new java.util.concurrent.ConcurrentHashMap<>();
+
     public boolean addSkill(int userId, String skillName, String skillType, String proficiencyLevel) {
+        return addSkill(userId, skillName, skillType, proficiencyLevel, null);
+    }
+
+    /**
+     * Adds a skill to a student's list. The skill is looked up in (or added to) the skills catalogue, so
+     * "java", "JAVA" and "Java" are the same skill. {@code category} may be null to detect it automatically.
+     */
+    public boolean addSkill(int userId, String skillName, String skillType, String proficiencyLevel, String category) {
         if (userId <= 0 || skillName == null || skillName.trim().isEmpty()) return false;
-        String cleanSkill = skillName.trim();
+        String cleanSkill = SkillCatalog.normalizeName(skillName);
+        if (cleanSkill.isEmpty()) return false;
         String cleanType = (skillType != null && skillType.equalsIgnoreCase("LEARN")) ? "LEARN" : "TEACH";
         String cleanProf = (proficiencyLevel != null && !proficiencyLevel.isEmpty()) ? proficiencyLevel : "Intermediate";
+        String cat = SkillCatalog.cleanCategory(category);
 
         if (DBUtil.isDatabaseAvailable()) {
             // Check for existing duplicate skill
@@ -36,12 +50,14 @@ public class SkillDAO {
                     }
                 }
 
-                String sql = "INSERT INTO user_skills (user_id, skill_name, skill_type, proficiency_level) VALUES (?, ?, ?, ?)";
+                int skillId = findOrCreateSkillId(conn, cleanSkill, cat);
+                String sql = "INSERT INTO user_skills (user_id, skill_id, skill_name, skill_type, proficiency_level) VALUES (?, ?, ?, ?, ?)";
                 try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                     ps.setInt(1, userId);
-                    ps.setString(2, cleanSkill);
-                    ps.setString(3, cleanType);
-                    ps.setString(4, cleanProf);
+                    ps.setInt(2, skillId);
+                    ps.setString(3, cleanSkill);
+                    ps.setString(4, cleanType);
+                    ps.setString(5, cleanProf);
                     return ps.executeUpdate() > 0;
                 }
             } catch (SQLException e) {
@@ -56,8 +72,78 @@ public class SkillDAO {
                 return false;
             }
         }
+        memoryCatalogue.putIfAbsent(cleanSkill.toLowerCase(),
+                new String[]{cleanSkill, cat != null ? cat : SkillCatalog.categoryFor(cleanSkill)});
         memorySkills.add(new UserSkill(skillIdCounter.incrementAndGet(), userId, cleanSkill, cleanType, cleanProf));
         return true;
+    }
+
+    /** Finds the catalogue row for a skill (case-insensitive) or creates it. A category is only set when the skill is new. */
+    private int findOrCreateSkillId(Connection conn, String canonicalName, String category) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM skills WHERE LOWER(name) = LOWER(?)")) {
+            ps.setString(1, canonicalName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        }
+        try (PreparedStatement ps = conn.prepareStatement("INSERT INTO skills (name, category) VALUES (?, ?)",
+                Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, canonicalName);
+            ps.setString(2, category != null ? category : SkillCatalog.categoryFor(canonicalName));
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        }
+        throw new SQLException("Could not create skill " + canonicalName);
+    }
+
+    /** Category of a skill (General when unknown). */
+    public String getCategory(String skillName) {
+        String name = SkillCatalog.normalizeName(skillName);
+        if (name.isEmpty()) return SkillCatalog.GENERAL;
+        if (DBUtil.isDatabaseAvailable()) {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement ps = conn.prepareStatement("SELECT category FROM skills WHERE LOWER(name) = LOWER(?)")) {
+                ps.setString(1, name);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) return rs.getString(1);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            String[] row = memoryCatalogue.get(name.toLowerCase());
+            if (row != null) return row[1];
+        }
+        return SkillCatalog.categoryFor(name);
+    }
+
+    /** All category names, for dropdowns and leaderboard tabs. */
+    public List<String> getCategories() {
+        return SkillCatalog.CATEGORIES;
+    }
+
+    /** Categories that at least one student teaches (used for the leaderboard tabs). */
+    public List<String> getCategoriesInUse() {
+        java.util.Set<String> used = new java.util.LinkedHashSet<>();
+        if (DBUtil.isDatabaseAvailable()) {
+            String sql = "SELECT DISTINCT sk.category FROM user_skills us JOIN skills sk ON us.skill_id = sk.id WHERE us.skill_type = 'TEACH'";
+            try (Connection conn = DBUtil.getConnection();
+                 Statement st = conn.createStatement();
+                 ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) used.add(rs.getString(1));
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            for (UserSkill us : memorySkills) {
+                if ("TEACH".equalsIgnoreCase(us.getSkillType())) used.add(getCategory(us.getSkillName()));
+            }
+        }
+        List<String> ordered = new ArrayList<>();
+        for (String c : SkillCatalog.CATEGORIES) if (used.contains(c)) ordered.add(c);
+        return ordered;
     }
 
     public boolean deleteSkill(int userSkillId, int userId) {

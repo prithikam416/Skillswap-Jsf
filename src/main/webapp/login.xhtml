@@ -133,6 +133,12 @@
                     </div>
                 </h:panelGroup>
 
+                <h:panelGroup rendered="#{param['verified'] eq 'true'}">
+                    <div class="w-full bg-teal-50 border border-teal-300 text-teal-800 px-4 py-3 rounded-xl mb-5 text-sm font-medium">
+                        Email verified! You can sign in now.
+                    </div>
+                </h:panelGroup>
+
                 <!-- Login Form -->
                 <h:form id="loginForm" class="w-full flex flex-col gap-4">
                     

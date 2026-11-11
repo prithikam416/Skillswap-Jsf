@@ -102,6 +102,75 @@ public class LeaderboardBean implements Serializable {
         return entries;
     }
 
+    // ---------------- Category-wise leaderboard ("Top Python Mentor") ----------------
+
+    private String selectedCategory = "";
+
+    /** Categories that at least one student teaches. */
+    public List<String> getCategories() {
+        return skillDAO.getCategoriesInUse();
+    }
+
+    /**
+     * Mentor ranking inside one category. Only sessions where the student was the
+     * teacher (receiver of the request) for a skill in that category count:
+     * 20 pts per completed session + 10 pts per rating + average rating x 5.
+     */
+    public List<LeaderboardEntry> getCategoryLeaderboard() {
+        List<LeaderboardEntry> entries = new ArrayList<>();
+        if (selectedCategory == null || selectedCategory.isEmpty()) return entries;
+
+        java.util.Map<Integer, java.util.Set<Integer>> mentorSessions = new java.util.HashMap<>();
+        for (ExchangeRequest r : exchangeRequestDAO.getAllRequests()) {
+            if (!r.isCompleted()) continue;
+            if (!selectedCategory.equals(skillDAO.getCategory(r.getSkillName()))) continue;
+            mentorSessions.computeIfAbsent(r.getReceiverId(), k -> new java.util.HashSet<>()).add(r.getId());
+        }
+        List<Rating> allRatings = ratingDAO.getAllRatings();
+
+        for (User student : userDAO.getStudents()) {
+            if (!student.isActive()) continue;
+            java.util.Set<Integer> ids = mentorSessions.get(student.getId());
+            if (ids == null || ids.isEmpty()) continue;
+
+            int count = 0;
+            int sum = 0;
+            for (Rating rt : allRatings) {
+                if (rt.getRatedId() == student.getId() && ids.contains(rt.getExchangeId())) {
+                    count++;
+                    sum += rt.getScore();
+                }
+            }
+            double avg = count == 0 ? 0 : Math.round(sum * 100.0 / count) / 100.0;
+
+            LeaderboardEntry e = new LeaderboardEntry();
+            e.setStudent(student);
+            e.setCompletedExchanges(ids.size());
+            e.setAverageRating(avg);
+            e.setTotalRatings(count);
+            e.setTotalPoints(ids.size() * 20 + count * 10 + (int) (avg * 5));
+            List<String> names = new ArrayList<>();
+            for (UserSkill s : skillDAO.getUserSkills(student.getId(), "TEACH")) {
+                if (selectedCategory.equals(skillDAO.getCategory(s.getSkillName()))) names.add(s.getSkillName());
+            }
+            e.setSkillsOffered(names);
+            entries.add(e);
+        }
+        entries.sort((a, b) -> {
+            int c = Integer.compare(b.getTotalPoints(), a.getTotalPoints());
+            return c != 0 ? c : Double.compare(b.getAverageRating(), a.getAverageRating());
+        });
+        for (int i = 0; i < entries.size(); i++) entries.get(i).setRank(i + 1);
+        return entries;
+    }
+
+    public String getTopMentorTitle() {
+        return "Top " + selectedCategory + " Mentors";
+    }
+
+    public String getSelectedCategory() { return selectedCategory; }
+    public void setSelectedCategory(String c) { this.selectedCategory = c == null ? "" : c; }
+
     /**
      * Get top 3 students for the podium.
      */

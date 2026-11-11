@@ -200,7 +200,7 @@
                                 Welcome back, #{userBean.currentUser.name}!
                             </h1>
                             <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-                                #{userBean.currentUser.department} • USN: <span class="font-mono text-brand-300">#{userBean.currentUser.usn}</span>
+                                <span class="px-2 py-0.5 rounded-full bg-white/15 text-[11px] font-bold mr-1">#{userBean.roleLabel}</span> #{userBean.currentUser.department} • USN: <span class="font-mono text-brand-300">#{userBean.currentUser.usn}</span>
                             </p>
                             <h:panelGroup rendered="#{not empty userBean.currentUser.bio}">
                                 <p class="text-xs text-slate-300/80 italic">"#{userBean.currentUser.bio}"</p>
