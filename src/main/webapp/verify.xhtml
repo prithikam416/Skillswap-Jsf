@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkillSwap - Verify Email</title>
+
+    <!-- Google Fonts & Material Symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                        },
+                        navy: {
+                            800: '#16324F',
+                            900: '#0f2338',
+                            950: '#091522'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        .field-error-msg {
+            color: #ef4444 !important;
+            font-size: 0.82rem !important;
+            font-weight: 600 !important;
+            display: block !important;
+            margin-top: 0.35rem !important;
+        }
+        .ui-messages-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            padding: 0.85rem 1.25rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.9rem;
+            list-style: none;
+        }
+        .ui-messages-info {
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            color: #0f766e;
+            padding: 0.85rem 1.25rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.9rem;
+            list-style: none;
+        }
+    </style>
+</h:head>
+
+<h:body class="min-h-screen flex flex-col justify-between bg-[#F8FAFC] font-sans text-slate-800">
+
+    <!-- Top Navigation Header -->
+    <header class="w-full bg-[#16324F] text-white border-b border-slate-700/60 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+            <a href="index.xhtml" class="flex items-center gap-3 no-underline group">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#14b8a6] to-[#2dd4bf] flex items-center justify-center shadow-md shadow-teal-500/20 transition-transform group-hover:scale-105 shrink-0">
+                    <svg class="w-5 h-5 text-[#081422]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M7 16V8a3 3 0 0 1 6 0v8a3 3 0 0 0 6 0V8" />
+                        <path d="M4 13l3 3 3-3" />
+                        <path d="M16 11l3-3 3 3" />
+                    </svg>
+                </div>
+                <div class="flex flex-col text-left">
+                    <span class="text-[20px] font-extrabold tracking-tight font-display leading-tight text-white group-hover:opacity-95 transition-opacity">
+                        Skill<span class="text-[#2dd4bf]">Swap</span>
+                    </span>
+                    <span class="text-[9px] font-bold tracking-[0.22em] text-[#2dd4bf] uppercase leading-none mt-0.5">
+                        Campus Exchange
+                    </span>
+                </div>
+            </a>
+            <div class="flex items-center gap-6 font-semibold text-white text-[15px]">
+                <a class="text-slate-200 hover:text-[#14b8a6] transition-colors" href="index.xhtml">Home</a>
+                <a class="text-slate-200 hover:text-[#14b8a6] transition-colors" href="search.xhtml">Find Mentors</a>
+                <a class="text-[#14b8a6] font-bold" href="login.xhtml">Login</a>
+                <a class="bg-[#14b8a6] text-white font-bold px-5 py-2 rounded-xl hover:bg-white hover:text-[#16324F] transition-all shadow-md shadow-[#14b8a6]/20" href="register.xhtml">Register</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Login Section -->
+    <main class="flex-1 flex items-center justify-center w-full px-4 py-12 relative overflow-hidden bg-gradient-to-br from-slate-50 via-slate-100 to-teal-50/30">
+        <!-- Ambient Glowing Background Elements -->
+        <div class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-teal-400/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-sky-400/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/4 right-10 w-64 h-64 rounded-full border border-teal-200/50 pointer-events-none"></div>
+        <div class="absolute bottom-1/4 left-10 w-48 h-48 rounded-full border border-slate-200/80 pointer-events-none"></div>
+
+        <!-- Clean Light Form Card -->
+        <div class="w-full max-w-lg mx-auto my-4 relative z-10">
+            <div class="bg-white border border-slate-200/90 rounded-[32px] p-8 sm:p-11 shadow-xl shadow-slate-200/60 flex flex-col items-center">
+                
+                <!-- Icon Badge -->
+                <div class="w-16 h-16 rounded-2xl bg-white/40 backdrop-blur-md border border-white/80 shadow-sm shadow-slate-200/50 flex items-center justify-center mb-4 text-[#0d9488]">
+                    <span class="material-symbols-outlined text-[32px] text-[#0d9488]">lock</span>
+                </div>
+
+                <h1 class="text-[28px] sm:text-[32px] font-bold text-slate-900 text-center font-display tracking-tight mb-2">Verify your college email</h1>
+                <p class="text-[15px] text-slate-500 text-center mb-7">
+                    SkillSwap is campus-only. We sent a 6-digit code to
+                    <strong>#{userBean.pendingEmail}</strong>. It is valid for 10 minutes.
+                </p>
+
+                <div class="w-full">
+                    <h:messages globalOnly="true" styleClass="ui-messages"
+                                infoClass="ui-messages-info" errorClass="ui-messages-error" />
+                </div>
+
+                <h:panelGroup rendered="#{userBean.demoMode}">
+                    <div class="w-full bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded-xl mb-5 text-sm">
+                        <strong>Demo mode:</strong> no email server is configured, so the code is shown here:
+                        <span class="font-mono font-bold text-lg tracking-widest ml-1">#{userBean.demoCode}</span>
+                    </div>
+                </h:panelGroup>
+
+                <h:form id="verifyForm" class="w-full flex flex-col gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[14px] font-bold text-slate-700" for="verifyForm:verifyCode">Verification code</label>
+                        <h:inputText id="verifyCode" value="#{userBean.verifyCode}" maxlength="6"
+                                     class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 text-[22px] tracking-[0.5em] text-center font-mono focus:outline-none focus:border-[#14b8a6] focus:bg-white focus:ring-4 focus:ring-teal-500/10 transition-all" placeholder="000000" />
+                    </div>
+                    <div class="pt-2">
+                        <h:commandButton id="verifyBtn" value="Verify and continue →" action="#{userBean.verifyEmailCode}"
+                                         class="w-full bg-[#14b8a6] hover:bg-[#0d9488] text-white font-bold text-[16px] py-3.5 px-6 rounded-xl border-none transition-all shadow-lg shadow-teal-500/25 cursor-pointer" />
+                    </div>
+                    <div class="text-center pt-2">
+                        <h:commandLink id="resendLink" value="Send me a new code" action="#{userBean.resendVerificationCode}"
+                                       styleClass="font-bold text-[#14b8a6] hover:underline" immediate="true" />
+                    </div>
+                </h:form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full bg-white border-t border-slate-200 text-slate-600 py-5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-[#14b8a6] text-[22px]">handshake</span>
+                <span class="text-[14px] font-bold text-slate-800">SkillSwap Campus Network</span>
+                <span class="text-slate-300">•</span>
+                <span class="text-[13px] text-slate-500">Peer-to-peer campus verification</span>
+            </div>
+            <div class="text-[12px] font-bold text-[#0d9488] bg-teal-50 border border-teal-200 px-3 py-1 rounded-lg">ACTIVE NODE: CAMPUS-01</div>
+        </div>
+    </footer>
+
+</h:body>
+</html>

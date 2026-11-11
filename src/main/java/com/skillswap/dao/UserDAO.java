@@ -84,8 +84,8 @@ public class UserDAO {
         user.setActive(true);
 
         if (DBUtil.isDatabaseAvailable()) {
-            String sql = "INSERT INTO users (usn, name, email, password, department, bio, reputation_score, role, active) " +
-                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO users (usn, name, email, password, department, bio, reputation_score, role, active, email_verified) " +
+                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, user.getUsn().trim());
@@ -97,6 +97,7 @@ public class UserDAO {
                 ps.setDouble(7, user.getReputationScore() >= 0 ? user.getReputationScore() : 0.0);
                 ps.setString(8, user.getRole());
                 ps.setBoolean(9, user.isActive());
+                ps.setBoolean(10, user.isEmailVerified());
 
                 int rows = ps.executeUpdate();
                 if (rows > 0) {
@@ -245,6 +246,82 @@ public class UserDAO {
         return new ArrayList<>(memoryUsers);
     }
 
+    // ====== Email verification (verified campus accounts) ======
+
+    /** Stores a fresh verification code for the account with this email (valid for 10 minutes). */
+    public boolean saveVerificationCode(String email, String code) {
+        if (email == null || code == null) return false;
+        if (DBUtil.isDatabaseAvailable()) {
+            String sql = "UPDATE users SET verify_code = ?, verify_expires = ? WHERE LOWER(email) = LOWER(?)";
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, code);
+                ps.setTimestamp(2, new java.sql.Timestamp(System.currentTimeMillis() + 10 * 60 * 1000L));
+                ps.setString(3, email.trim());
+                return ps.executeUpdate() > 0;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        for (User u : memoryUsers) {
+            if (u.getEmail().equalsIgnoreCase(email.trim())) {
+                u.setVerifyCode(code);
+                u.setVerifyExpires(System.currentTimeMillis() + 10 * 60 * 1000L);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Marks the account verified when the code matches and has not expired. */
+    public boolean verifyEmail(String email, String code) {
+        if (email == null || code == null || code.trim().isEmpty()) return false;
+        if (DBUtil.isDatabaseAvailable()) {
+            String sql = "UPDATE users SET email_verified = 1, verify_code = NULL, verify_expires = NULL " +
+                         "WHERE LOWER(email) = LOWER(?) AND verify_code = ? AND verify_expires > ?";
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, email.trim());
+                ps.setString(2, code.trim());
+                ps.setTimestamp(3, new java.sql.Timestamp(System.currentTimeMillis()));
+                return ps.executeUpdate() > 0;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        for (User u : memoryUsers) {
+            if (u.getEmail().equalsIgnoreCase(email.trim()) && code.trim().equals(u.getVerifyCode())
+                    && u.getVerifyExpires() > System.currentTimeMillis()) {
+                u.setEmailVerified(true);
+                u.setVerifyCode(null);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isEmailVerified(String email) {
+        if (email == null) return false;
+        if (DBUtil.isDatabaseAvailable()) {
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement ps = conn.prepareStatement("SELECT email_verified FROM users WHERE LOWER(email) = LOWER(?)")) {
+                ps.setString(1, email.trim());
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) return rs.getBoolean(1);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+        for (User u : memoryUsers) {
+            if (u.getEmail().equalsIgnoreCase(email.trim())) return u.isEmailVerified();
+        }
+        return false;
+    }
+
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         User u = new User();
         u.setId(rs.getInt("id"));
@@ -257,6 +334,7 @@ public class UserDAO {
         u.setReputationScore(rs.getDouble("reputation_score"));
         try { u.setRole(rs.getString("role")); } catch (SQLException e) { u.setRole("STUDENT"); }
         try { u.setActive(rs.getBoolean("active")); } catch (SQLException e) { u.setActive(true); }
+        try { u.setEmailVerified(rs.getBoolean("email_verified")); } catch (SQLException e) { u.setEmailVerified(true); }
         try { 
             java.sql.Timestamp ts = rs.getTimestamp("created_at");
             if (ts != null) u.setCreatedAt(ts.toString());
@@ -290,7 +368,7 @@ public class UserDAO {
                 conn.setAutoCommit(false);
                 try {
                     // 1. Delete dependent ratings
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM ratings WHERE rater_id = ? OR rated_id = ?")) {
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM reviews WHERE rater_id = ? OR rated_id = ?")) {
                         ps.setInt(1, userId);
                         ps.setInt(2, userId);
                         ps.executeUpdate();
@@ -302,7 +380,7 @@ public class UserDAO {
                         ps.executeUpdate();
                     }
                     // 3. Delete dependent exchange requests
-                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM exchange_requests WHERE sender_id = ? OR receiver_id = ?")) {
+                    try (PreparedStatement ps = conn.prepareStatement("DELETE FROM learning_requests WHERE sender_id = ? OR receiver_id = ?")) {
                         ps.setInt(1, userId);
                         ps.setInt(2, userId);
                         ps.executeUpdate();

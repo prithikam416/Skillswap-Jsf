@@ -35,6 +35,11 @@ public class UserBean implements Serializable {
     private String loginIdentifier; // USN or Email
     private String loginPassword;
 
+    // Email verification (verified campus accounts)
+    private String pendingEmail;      // account that is waiting for its code
+    private String verifyCode;        // what the student types in
+    private String demoCode;          // shown on screen only while no SMTP server is configured (demo mode)
+
     public UserBean() {}
 
     /**
@@ -78,6 +83,13 @@ public class UserBean implements Serializable {
             return null;
         }
 
+        // 2b. Campus-only: the address must belong to the college
+        if (!com.skillswap.util.CampusConfig.isCampusEmail(cleanEmail)) {
+            addErrorMessage("SkillSwap is for this campus only. Please register with your college email (@"
+                    + com.skillswap.util.CampusConfig.describe() + ").");
+            return null;
+        }
+
         // 3. Password length validation
         if (regPassword.trim().length() < 6) {
             addErrorMessage("Password must be at least 6 characters in length.");
@@ -114,12 +126,16 @@ public class UserBean implements Serializable {
         newUser.setReputationScore(0.0);
         newUser.setRole("STUDENT"); // Strictly enforce student role
         newUser.setActive(true);
+        newUser.setEmailVerified(false);   // must confirm the code sent to the college email first
 
         boolean success = userDAO.register(newUser);
         if (success) {
+            String emailForCode = newUser.getEmail();
+            String nameForCode = newUser.getName();
             // Reset registration fields
             regUsn = regName = regEmail = regPassword = regConfirmPassword = regDepartment = regBio = "";
-            return "login?faces-redirect=true&registered=true";
+            startVerification(emailForCode, nameForCode);
+            return "verify?faces-redirect=true";
         } else {
             addErrorMessage("Registration failed due to a database error. Please try again.");
             return null;
@@ -151,6 +167,12 @@ public class UserBean implements Serializable {
                 return null;
             }
 
+            if (!user.isEmailVerified()) {
+                startVerification(user.getEmail(), user.getName());
+                addErrorMessage("Please verify your college email first. We sent a new code to " + user.getEmail() + ".");
+                return "verify?faces-redirect=true";
+            }
+
             // Defend against session fixation
             try {
                 HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance()
@@ -176,6 +198,70 @@ public class UserBean implements Serializable {
             addErrorMessage("Invalid credentials. Please verify your Email/USN and password.");
             return null;
         }
+    }
+
+    // ---------------- verified campus accounts ----------------
+
+    /** Creates a 6-digit code, stores it for 10 minutes and emails it to the student. */
+    private void startVerification(String email, String name) {
+        String code = String.format("%06d", new java.security.SecureRandom().nextInt(1_000_000));
+        userDAO.saveVerificationCode(email, code);
+        com.skillswap.util.EmailService.EmailResult r = com.skillswap.util.EmailService.sendOtpEmail(email, name, code);
+        this.pendingEmail = email;
+        this.verifyCode = "";
+        // no SMTP server configured: show the code on the page so the demo still works
+        this.demoCode = r.isSimulated() ? code : null;
+    }
+
+    public String verifyEmailCode() {
+        if (pendingEmail == null) {
+            addErrorMessage("Please register or sign in first.");
+            return "login?faces-redirect=true";
+        }
+        if (verifyCode == null || verifyCode.trim().isEmpty()) {
+            addErrorMessage("Enter the 6-digit code from your email.");
+            return null;
+        }
+        if (userDAO.verifyEmail(pendingEmail, verifyCode)) {
+            pendingEmail = null;
+            verifyCode = "";
+            demoCode = null;
+            return "login?faces-redirect=true&verified=true";
+        }
+        addErrorMessage("That code is wrong or has expired. Check the code or request a new one.");
+        return null;
+    }
+
+    public String resendVerificationCode() {
+        if (pendingEmail == null) return "login?faces-redirect=true";
+        com.skillswap.model.User u = null;
+        for (com.skillswap.model.User x : userDAO.getAllUsers()) {
+            if (x.getEmail().equalsIgnoreCase(pendingEmail)) { u = x; break; }
+        }
+        startVerification(pendingEmail, u != null ? u.getName() : "Student");
+        addInfoMessage("A new code has been sent to " + pendingEmail + ".");
+        return null;
+    }
+
+    public String getPendingEmail() { return pendingEmail; }
+    public String getVerifyCode() { return verifyCode; }
+    public void setVerifyCode(String verifyCode) { this.verifyCode = verifyCode; }
+    public String getDemoCode() { return demoCode; }
+    public boolean isDemoMode() { return demoCode != null; }
+    public String getCollegeDomains() { return com.skillswap.util.CampusConfig.describe(); }
+
+    /** Learner, Mentor, or both - derived from the skills the student has listed. */
+    public String getRoleLabel() {
+        if (currentUser == null) return "";
+        if (currentUser.isAdmin()) return "Administrator";
+        boolean teaches = false;
+        boolean learns = false;
+        for (com.skillswap.model.UserSkill us : new com.skillswap.dao.SkillDAO().getUserSkills(currentUser.getId(), null)) {
+            if ("TEACH".equalsIgnoreCase(us.getSkillType())) teaches = true; else learns = true;
+        }
+        if (teaches && learns) return "Learner & Mentor";
+        if (teaches) return "Mentor";
+        return "Learner";
     }
 
     /**

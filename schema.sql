@@ -34,16 +34,13 @@ CREATE TABLE IF NOT EXISTS user_skills (
 );
 
 -- 3. Exchange Requests Table
-CREATE TABLE IF NOT EXISTS exchange_requests (
+CREATE TABLE IF NOT EXISTS learning_requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
     sender_id INT NOT NULL,
     receiver_id INT NOT NULL,
     skill_name VARCHAR(100) NOT NULL,
     message TEXT,
     status VARCHAR(20) DEFAULT 'PENDING',      -- PENDING, ACCEPTED, REJECTED, COMPLETED, CANCELLED
-    session_date DATETIME NULL,                -- booked session time (set when accepted)
-    session_mode VARCHAR(20) NULL,             -- 'Online' or 'In-Person'
-    session_location VARCHAR(255) NULL,        -- meeting link or campus room
     response_note TEXT NULL,                   -- receiver's note when accepting / declining
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -52,6 +49,29 @@ CREATE TABLE IF NOT EXISTS exchange_requests (
 );
 
 -- 4. Reports Table
+-- Skill catalogue (one row per distinct skill, with a category used by the category leaderboards)
+CREATE TABLE IF NOT EXISTS skills (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    category VARCHAR(50) NOT NULL DEFAULT 'General',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+ALTER TABLE user_skills ADD COLUMN skill_id INT NULL;   -- skip if it already exists (the app does this automatically)
+
+-- One row per booked session (1:1 with an accepted request)
+CREATE TABLE IF NOT EXISTS sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    request_id INT NOT NULL UNIQUE,
+    scheduled_at DATETIME NULL,
+    mode VARCHAR(20) NULL,
+    location VARCHAR(255) NULL,
+    status VARCHAR(20) DEFAULT 'SCHEDULED',
+    completed_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (request_id) REFERENCES learning_requests(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS reports (
     id INT AUTO_INCREMENT PRIMARY KEY,
     reporter_id INT NOT NULL,
@@ -67,7 +87,7 @@ CREATE TABLE IF NOT EXISTS reports (
 );
 
 -- 5. Ratings Table
-CREATE TABLE IF NOT EXISTS ratings (
+CREATE TABLE IF NOT EXISTS reviews (
     id INT AUTO_INCREMENT PRIMARY KEY,
     rater_id INT NOT NULL,
     rated_id INT NOT NULL,
@@ -77,7 +97,7 @@ CREATE TABLE IF NOT EXISTS ratings (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (rater_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (rated_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (exchange_id) REFERENCES exchange_requests(id) ON DELETE CASCADE,
+    FOREIGN KEY (exchange_id) REFERENCES learning_requests(id) ON DELETE CASCADE,
     UNIQUE KEY unique_rating (rater_id, exchange_id)
 );
 
